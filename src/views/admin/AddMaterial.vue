@@ -24,10 +24,28 @@ const questions = ref(
   }))
 )
 
-const route = useRoute()
 const isEditMode = ref(false)
 
+// ── State Popup Notifikasi ──
+const popup = ref({ show: false, message: '', type: 'success' })
+const showPopup = (message, type = 'success') => {
+  popup.value = { show: true, message, type }
+  setTimeout(() => { popup.value.show = false }, 3000)
+}
+
+// ── State Popup Konfirmasi Logout ──
+const confirmLogout = ref(false)
+const logout = () => {
+  isSidebarOpen.value = false
+  confirmLogout.value = true
+}
+const doLogout = () => {
+  localStorage.removeItem('admin_auth')
+  router.push('/admin/login')
+}
+
 onMounted(() => {
+  const route = useRoute()
   if(route.params.id) {
     isEditMode.value = true
     const editMat = store.materials.find(m => String(m.id) === String(route.params.id))
@@ -37,7 +55,6 @@ onMounted(() => {
       materialForm.value.videoUrl = editMat.video_url || ''
       materialForm.value.imageUrl = editMat.image_url || ''
       
-      // Load Pertanyaan yang sudah ada, lalu pad length ke 10 agar format view gak berubah
       if(editMat.quiz_questions && editMat.quiz_questions.length > 0) {
         let loadedQ = editMat.quiz_questions.map(q => ({
           id: q.id,
@@ -48,7 +65,6 @@ onMounted(() => {
           optionD: q.option_d,
           correctAnswer: q.correct_option
         }))
-        
         while(loadedQ.length < 10) {
           loadedQ.push({ text: '', optionA: '', optionB: '', optionC: '', optionD: '', correctAnswer: 'A' })
         }
@@ -58,45 +74,11 @@ onMounted(() => {
   }
 })
 
-const handleImageUpload = async (e) => {
-  const file = e.target.files[0]
-  if(!file) return
-  
-  try {
-    const img = new Image()
-    img.src = URL.createObjectURL(file)
-    await new Promise((resolve, reject) => {
-      img.onload = resolve
-      img.onerror = reject
-    })
-    
-    const canvas = document.createElement('canvas')
-    const MAX_WIDTH = 800
-    let scaleSize = 1
-    
-    // Jangan perbesar gambar kecil, hanya perkecil gambar besar
-    if (img.width > MAX_WIDTH) {
-      scaleSize = MAX_WIDTH / img.width
-      canvas.width = MAX_WIDTH
-      canvas.height = img.height * scaleSize
-    } else {
-      canvas.width = img.width
-      canvas.height = img.height
-    }
-    
-    const ctx = canvas.getContext('2d')
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
-    
-    // Update ref secara eksplisit dengan .value
-    materialForm.value.imageUrl = canvas.toDataURL('image/jpeg', 0.7)
-  } catch(err) {
-    alert("Gagal memproses gambar saat di-upload: " + err.message)
-  }
-}
-
 const submitData = async () => {
-  if (!materialForm.value.title) return alert("Peringatan: Judul materi pembelajaran wajib diisi!")
-  if (materialForm.value.title.length < 5) return alert("Judul minimal harus berisi 5 huruf atau lebih.")
+  if (!materialForm.value.title) return showPopup('Peringatan: Judul materi pembelajaran wajib diisi!', 'error')
+  if (materialForm.value.title.length < 5) return showPopup('Judul minimal harus berisi 5 huruf atau lebih.', 'error')
+  
+  const route = useRoute()
   
   if(isEditMode.value) {
     const success = await store.updateMaterial(route.params.id, {
@@ -106,10 +88,9 @@ const submitData = async () => {
       imageUrl: materialForm.value.imageUrl, 
       questions: questions.value 
     })
-    
     if(success) {
-      alert("Alhamdulillah! Materi PAI berhasil di-update.")
-      router.push('/admin/dashboard')
+      showPopup('Alhamdulillah! Materi PAI berhasil di-update.', 'success')
+      setTimeout(() => router.push('/admin/dashboard'), 3000)
     }
   } else {
     const success = await store.addMaterial({
@@ -119,28 +100,90 @@ const submitData = async () => {
       imageUrl: materialForm.value.imageUrl, 
       questions: questions.value 
     })
-    
     if(success) {
-      alert("Alhamdulillah! Materi Pendidikan Agama Islam dan susunan Kuis berhasil diterbitkan.")
-      router.push('/admin/dashboard')
+      showPopup('Alhamdulillah! Materi PAI dan susunan Kuis berhasil diterbitkan.', 'success')
+      setTimeout(() => router.push('/admin/dashboard'), 3000)
     }
   }
 }
 
 const isSidebarOpen = ref(false)
-
-const logout = () => {
-  if(confirm("Apakah Anda yakin ingin menggembok dashboard guru?")) {
-    localStorage.removeItem('admin_auth')
-    router.push('/admin/login')
-  }
-}
 </script>
 
 <template>
   <div class="min-h-screen bg-slate-50 flex flex-col md:flex-row shadow-inner text-slate-800 w-full relative">
-    
-    <!-- Mobile Header (Hanya tampil di HP) -->
+
+    <!-- ── POPUP NOTIFIKASI ── -->
+    <transition name="popup">
+      <div
+        v-if="popup.show"
+        class="fixed top-5 left-1/2 -translate-x-1/2 z-[999] w-[90vw] max-w-sm px-5 py-4 rounded-2xl shadow-2xl flex items-start gap-3 border"
+        :class="popup.type === 'success'
+          ? 'bg-emerald-900 border-emerald-600/50 text-white shadow-emerald-900/40'
+          : 'bg-red-900 border-red-600/50 text-white shadow-red-900/40'"
+      >
+        <div
+          class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-lg"
+          :class="popup.type === 'success' ? 'bg-emerald-700' : 'bg-red-700'"
+        >
+          {{ popup.type === 'success' ? '✅' : '⚠️' }}
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-bold text-sm leading-snug">
+            {{ popup.type === 'success' ? 'Berhasil' : 'Peringatan' }}
+          </p>
+          <p class="text-xs mt-0.5 opacity-80 leading-relaxed">{{ popup.message }}</p>
+        </div>
+        <button @click="popup.show = false" class="text-white/50 hover:text-white text-lg leading-none flex-shrink-0 mt-0.5 transition">✕</button>
+      </div>
+    </transition>
+
+    <!-- ── POPUP KONFIRMASI LOGOUT ── -->
+    <transition name="overlay-fade">
+      <div
+        v-if="confirmLogout"
+        class="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center px-4"
+        @click.self="confirmLogout = false"
+      >
+        <transition name="modal-pop">
+          <div
+            v-if="confirmLogout"
+            class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 flex flex-col items-center text-center gap-4"
+          >
+            <!-- Ikon -->
+            <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center text-3xl">
+              🔒
+            </div>
+
+            <!-- Teks -->
+            <div>
+              <h3 class="text-lg font-black text-slate-800 mb-1">Keluar dari Portal?</h3>
+              <p class="text-sm text-slate-500 leading-relaxed">
+                Sesi guru akan diakhiri. Anda perlu login kembali untuk mengakses dashboard.
+              </p>
+            </div>
+
+            <!-- Tombol -->
+            <div class="flex gap-3 w-full mt-1">
+              <button
+                @click="confirmLogout = false"
+                class="flex-1 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all active:scale-95"
+              >
+                Batal
+              </button>
+              <button
+                @click="doLogout"
+                class="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-500/30 transition-all active:scale-95"
+              >
+                Ya, Keluar
+              </button>
+            </div>
+          </div>
+        </transition>
+      </div>
+    </transition>
+
+    <!-- Mobile Header -->
     <div class="md:hidden bg-gradient-to-r from-emerald-800 to-emerald-900 text-white p-4 flex justify-between items-center shadow-md relative z-50">
       <div class="flex items-center gap-2">
         <span class="text-2xl">🕌</span>
@@ -152,7 +195,7 @@ const logout = () => {
       </button>
     </div>
 
-    <!-- Sidebar / Navigasi Admin Beranimasi -->
+    <!-- Sidebar -->
     <div 
       class="fixed inset-y-0 left-0 transform md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-40 w-72 bg-gradient-to-br from-emerald-800 via-emerald-900 to-yellow-600 animate-gradient animate-fadeInLeft text-white p-8 flex flex-col shadow-2xl overflow-y-auto"
       :class="{'translate-x-0': isSidebarOpen, '-translate-x-full': !isSidebarOpen}"
@@ -195,7 +238,7 @@ const logout = () => {
       </div>
     </div>
     
-    <!-- Mobile Overlay Black -->
+    <!-- Mobile Overlay -->
     <div v-if="isSidebarOpen" @click="isSidebarOpen = false" class="fixed inset-0 bg-black/50 z-30 md:hidden backdrop-blur-sm transition-opacity"></div>
 
     <!-- Form Konten Utama -->
@@ -206,10 +249,9 @@ const logout = () => {
         <p class="text-emerald-700/80 font-medium text-lg max-w-2xl mx-auto md:mx-0">{{ isEditMode ? 'Ubah konten materi PAI berserta pembaharuan evaluasi kuis untuk siswa.' : 'Isi detail materi PAI beserta media pembelajaran dan lembar evaluasinya untuk dikerjakan siswa.' }}</p>
       </div>
       
-      <!-- Box Raksasa Pengisian -->
       <div class="bg-white rounded-2xl border border-emerald-100 p-6 md:p-12 relative z-10 animate-slideUp">
         
-        <!-- Bagian Konten Materi -->
+        <!-- Bagian 1: Topik -->
         <section class="mb-14 relative z-10">
           <div class="flex items-center gap-4 border-b border-emerald-100 pb-5 mb-8">
             <div class="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-xl font-bold">1</div>
@@ -226,11 +268,22 @@ const logout = () => {
             </div>
             <div class="group">
               <label class="block font-bold text-emerald-800 text-sm mb-2">Upload Gambar Representasi</label>
-              <input type="file" accept="image/*" @change="handleImageUpload" class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-lg p-3 outline-none transition-colors text-slate-800 font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
-              <div v-if="materialForm.imageUrl" class="mt-4">
-                <p class="text-xs text-emerald-600 font-bold mb-2">✓ Gambar Siap Dipublish:</p>
-                <img :src="materialForm.imageUrl" class="h-24 w-auto rounded border border-emerald-200 shadow-sm object-cover" />
-              </div>
+              <input type="file" accept="image/*" @change="async (e) => { 
+                const file = e.target.files[0]; 
+                if(!file) return;
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                await new Promise(r => img.onload = r);
+                const canvas = document.createElement('canvas');
+                const MAX_WIDTH = 800;
+                const scaleSize = MAX_WIDTH / img.width;
+                canvas.width = MAX_WIDTH;
+                canvas.height = img.height * scaleSize;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                materialForm.imageUrl = canvas.toDataURL('image/jpeg', 0.6);
+              }" class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-lg p-3 outline-none transition-colors text-slate-800 font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
+              <p class="text-xs text-slate-500 mt-2" v-if="materialForm.imageUrl">Gambar siap dipublish ✓</p>
             </div>
           </div>
 
@@ -245,7 +298,7 @@ const logout = () => {
           </div>
         </section>
 
-        <!-- Bagian 10 Soal -->
+        <!-- Bagian 2: Soal -->
         <section class="mb-10 relative z-10 bg-slate-50 border border-slate-200 p-6 md:p-8 rounded-xl">
           <div class="flex items-center gap-4 border-b border-slate-200 pb-5 mb-8">
             <div class="w-10 h-10 bg-yellow-100 text-yellow-800 rounded-full flex items-center justify-center text-xl font-bold border border-yellow-200">2</div>
@@ -255,14 +308,11 @@ const logout = () => {
             </div>
           </div>
           
-          <!-- Kartu-kartu soal individu (1-10) -->
           <div v-for="(q, index) in questions" :key="index" class="bg-white p-6 rounded-xl mb-6 shadow-sm border border-slate-200">
             <div class="mb-4">
               <h3 class="font-bold text-emerald-800">Soal #{{ index + 1 }}</h3>
             </div>
-            
             <textarea v-model="q.text" placeholder="Tuliskan soal di sini..." class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-lg p-4 min-h-[100px] outline-none transition-colors mb-4 text-slate-800 resize-y"></textarea>
-            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div class="flex border border-slate-200 rounded-lg overflow-hidden focus-within:border-emerald-500 bg-white">
                 <div class="flex items-center justify-center w-12 bg-slate-100 text-slate-500 font-bold border-r border-slate-200">A</div>
@@ -281,7 +331,6 @@ const logout = () => {
                 <input v-model="q.optionD" type="text" class="w-full outline-none p-3 font-medium text-slate-800" placeholder="Jawaban D">
               </div>
             </div>
-            
             <div class="flex flex-col md:flex-row items-center gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
               <label class="font-bold text-slate-700">Kunci Jawaban:</label>
               <select v-model="q.correctAnswer" class="border border-slate-300 bg-white p-2 rounded-lg font-bold text-emerald-800 outline-none focus:border-emerald-500">
@@ -294,12 +343,53 @@ const logout = () => {
           </div>
         </section>
 
-        <!-- Tombol Lempar Publikasi Raksasa -->
+        <!-- Tombol Simpan -->
         <button @click="submitData" class="w-full flex justify-center py-4 px-4 rounded-xl shadow border border-emerald-600 bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 text-yellow-300 font-poppins font-bold text-lg md:text-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(4,120,87,0.6)] mt-8 tracking-wide">
-          <span>{{ isEditMode ? 'Simpan Update Materi' : 'Simpan Materi PAI' }}</span>
+          Simpan Materi PAI
         </button>
 
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Popup notifikasi */
+.popup-enter-active {
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.popup-leave-active {
+  transition: all 0.25s ease-in;
+}
+.popup-enter-from {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-20px) scale(0.9);
+}
+.popup-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-10px) scale(0.95);
+}
+
+/* Overlay konfirmasi logout */
+.overlay-fade-enter-active,
+.overlay-fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+.overlay-fade-enter-from,
+.overlay-fade-leave-to {
+  opacity: 0;
+}
+
+/* Modal konfirmasi logout */
+.modal-pop-enter-active {
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-pop-leave-active {
+  transition: all 0.2s ease-in;
+}
+.modal-pop-enter-from,
+.modal-pop-leave-to {
+  opacity: 0;
+  transform: scale(0.9) translateY(10px);
+}
+</style>

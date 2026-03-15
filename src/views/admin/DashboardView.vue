@@ -9,23 +9,111 @@ const materials = computed(() => store.materials)
 
 const isSidebarOpen = ref(false)
 
+// ── State Popup Konfirmasi Logout ──
+const confirmLogout = ref(false)
 const logout = () => {
-  if(confirm("Apakah Anda yakin ingin keluar dari gerbang Guru?")) {
-    localStorage.removeItem('admin_auth')
-    router.push('/admin/login')
-  }
+  isSidebarOpen.value = false
+  confirmLogout.value = true
+}
+const doLogout = () => {
+  localStorage.removeItem('admin_auth')
+  router.push('/admin/login')
 }
 
-const handleDelete = async (id) => {
-  if(confirm("Apakah Anda yakin ingin menghapus materi beserta semua kuis dan hasilnya secara permanen?")) {
-    await store.deleteMaterial(id)
-  }
+// ── State Popup Konfirmasi Hapus ──
+const confirmDelete = ref({ show: false, id: null })
+const handleDelete = (id) => {
+  confirmDelete.value = { show: true, id }
+}
+const doDelete = async () => {
+  await store.deleteMaterial(confirmDelete.value.id)
+  confirmDelete.value = { show: false, id: null }
 }
 </script>
 
 <template>
   <div class="min-h-screen bg-slate-50 flex flex-col md:flex-row shadow-inner text-slate-800 w-full">
-    
+
+    <!-- ── POPUP KONFIRMASI LOGOUT ── -->
+    <transition name="overlay-fade">
+      <div
+        v-if="confirmLogout"
+        class="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center px-4"
+        @click.self="confirmLogout = false"
+      >
+        <transition name="modal-pop">
+          <div
+            v-if="confirmLogout"
+            class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 flex flex-col items-center text-center gap-4"
+          >
+            <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center text-3xl">
+              🔒
+            </div>
+            <div>
+              <h3 class="text-lg font-black text-slate-800 mb-1">Keluar dari Portal?</h3>
+              <p class="text-sm text-slate-500 leading-relaxed">
+                Sesi guru akan diakhiri. Anda perlu login kembali untuk mengakses dashboard.
+              </p>
+            </div>
+            <div class="flex gap-3 w-full mt-1">
+              <button
+                @click="confirmLogout = false"
+                class="flex-1 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all active:scale-95"
+              >
+                Batal
+              </button>
+              <button
+                @click="doLogout"
+                class="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-500/30 transition-all active:scale-95"
+              >
+                Ya, Keluar
+              </button>
+            </div>
+          </div>
+        </transition>
+      </div>
+    </transition>
+
+    <!-- ── POPUP KONFIRMASI HAPUS ── -->
+    <transition name="overlay-fade">
+      <div
+        v-if="confirmDelete.show"
+        class="fixed inset-0 z-[999] bg-black/60 backdrop-blur-sm flex items-center justify-center px-4"
+        @click.self="confirmDelete.show = false"
+      >
+        <transition name="modal-pop">
+          <div
+            v-if="confirmDelete.show"
+            class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 flex flex-col items-center text-center gap-4"
+          >
+            <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center text-3xl">
+              🗑️
+            </div>
+            <div>
+              <h3 class="text-lg font-black text-slate-800 mb-1">Hapus Materi?</h3>
+              <p class="text-sm text-slate-500 leading-relaxed">
+                Materi beserta semua kuis dan hasil siswa akan dihapus secara permanen dan tidak bisa dikembalikan.
+              </p>
+            </div>
+            <div class="flex gap-3 w-full mt-1">
+              <button
+                @click="confirmDelete.show = false"
+                class="flex-1 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all active:scale-95"
+              >
+                Batal
+              </button>
+              <button
+                @click="doDelete"
+                class="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-500/30 transition-all active:scale-95"
+              >
+                Ya, Hapus
+              </button>
+            </div>
+          </div>
+        </transition>
+      </div>
+    </transition>
+
     <!-- Mobile Header -->
     <div class="md:hidden bg-gradient-to-r from-emerald-800 to-emerald-900 text-white p-4 flex justify-between items-center shadow-md relative z-50">
       <div class="flex items-center gap-2">
@@ -110,7 +198,7 @@ const handleDelete = async (id) => {
           </router-link>
         </div>
 
-        <!-- ── TABEL: hanya tampil di md ke atas ── -->
+        <!-- Tabel: md ke atas -->
         <div class="hidden md:block overflow-x-auto">
           <table class="w-full text-left border-collapse min-w-[600px]">
             <thead>
@@ -154,7 +242,7 @@ const handleDelete = async (id) => {
           </table>
         </div>
 
-        <!-- ── CARD LIST: hanya tampil di mobile (< md) ── -->
+        <!-- Card List: mobile -->
         <div class="md:hidden divide-y divide-slate-100">
 
           <div v-if="materials.length === 0" class="p-12 text-center">
@@ -167,7 +255,6 @@ const handleDelete = async (id) => {
             :key="mat.id"
             class="p-4 flex gap-4 items-start hover:bg-slate-50 transition-colors"
           >
-            <!-- Sampul Visual -->
             <div class="w-20 h-20 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0 relative">
               <img v-if="mat.image_url" :src="mat.image_url" class="absolute inset-0 w-full h-full object-cover" />
               <div v-else class="absolute inset-0 flex items-center justify-center bg-slate-100">
@@ -175,13 +262,10 @@ const handleDelete = async (id) => {
               </div>
             </div>
 
-            <!-- Topik Kajian + Aksi -->
             <div class="flex-1 min-w-0">
               <p class="font-bold text-emerald-900 text-base leading-snug line-clamp-2 mb-1">{{ mat.title }}</p>
               <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-2">{{ mat.content || 'Catatan tidak tersedia' }}</p>
               <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full inline-block mb-3">Dipublish ✓</span>
-
-              <!-- Aksi Cepat -->
               <div class="flex gap-2">
                 <button 
                   @click="router.push('/admin/materi/edit/' + mat.id)" 
@@ -204,3 +288,26 @@ const handleDelete = async (id) => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.overlay-fade-enter-active,
+.overlay-fade-leave-active {
+  transition: opacity 0.25s ease;
+}
+.overlay-fade-enter-from,
+.overlay-fade-leave-to {
+  opacity: 0;
+}
+
+.modal-pop-enter-active {
+  transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.modal-pop-leave-active {
+  transition: all 0.2s ease-in;
+}
+.modal-pop-enter-from,
+.modal-pop-leave-to {
+  opacity: 0;
+  transform: scale(0.9) translateY(10px);
+}
+</style>
