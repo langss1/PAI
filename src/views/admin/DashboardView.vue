@@ -1,80 +1,154 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useMainStore } from '../../stores/mainStore'
 
 const store = useMainStore()
+const router = useRouter()
 const materials = computed(() => store.materials)
 
-const showAddModal = ref(false)
-const newMaterial = ref({ title: '', content: '' })
+const isSidebarOpen = ref(false)
 
-const saveMaterial = () => {
-  if (!newMaterial.value.title) return alert('Isi judul!')
-  
-  // Tambah materi ke global store
-  store.addMaterial({ 
-    id: Date.now().toString(), 
-    title: newMaterial.value.title,
-    content: newMaterial.value.content || 'Isi tidak tersedia.'
-  })
-  
-  showAddModal.value = false
-  newMaterial.value = { title: '', content: '' }
-  alert('Materi berhasil ditambahkan ke dashboard siswa.')
+const logout = () => {
+  if(confirm("Apakah Anda yakin ingin keluar dari gerbang Guru?")) {
+    localStorage.removeItem('admin_auth')
+    router.push('/admin/login')
+  }
+}
+
+const handleDelete = async (id) => {
+  if(confirm("Apakah Anda yakin ingin menghapus materi beserta semua kuis dan hasilnya secara permanen?")) {
+    await store.deleteMaterial(id)
+  }
 }
 </script>
 
 <template>
-  <div class="p-8 max-w-5xl mx-auto flex flex-col md:flex-row gap-6">
+  <div class="min-h-screen bg-slate-50 flex flex-col md:flex-row shadow-inner text-slate-800 w-full">
     
-    <!-- Sidebar / Navigasi Admin -->
-    <div class="w-full md:w-64 bg-slate-800 text-white rounded-lg p-6 flex-shrink-0">
-      <h2 class="text-xl font-bold mb-8">Admin Guru</h2>
-      <ul class="space-y-4">
-        <li><router-link to="/admin/dashboard" class="block hover:bg-slate-700 p-2 rounded">Dashboard & Materi</router-link></li>
-        <li><router-link to="/admin/materi/tambah" class="block hover:bg-slate-700 p-2 rounded">Buat Materi & Kuis</router-link></li>
-        <li><router-link to="/admin/kehadiran" class="block hover:bg-slate-700 p-2 rounded">Nilai & Kehadiran</router-link></li>
-        <li class="mt-8 pt-4 border-t border-slate-600"><router-link to="/" class="block text-gray-300 hover:text-white">&larr; Keluar ke Siswa</router-link></li>
-      </ul>
+    <!-- Mobile Header (Hanya tampil di HP) -->
+    <div class="md:hidden bg-gradient-to-r from-emerald-800 to-emerald-900 text-white p-4 flex justify-between items-center shadow-md relative z-50">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🕌</span>
+        <h2 class="text-xl font-black bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 to-yellow-400 tracking-wide">Portal Guru</h2>
+      </div>
+      <button @click="isSidebarOpen = !isSidebarOpen" class="text-yellow-400 p-2 focus:outline-none">
+        <svg v-if="!isSidebarOpen" class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        <svg v-else class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
     </div>
+
+    <!-- Sidebar / Navigasi Admin Beranimasi -->
+    <div 
+      class="fixed inset-y-0 left-0 transform md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-40 w-72 bg-gradient-to-br from-emerald-800 via-emerald-900 to-yellow-600 animate-gradient animate-fadeInLeft text-white p-8 flex flex-col shadow-2xl overflow-y-auto"
+      :class="{'translate-x-0': isSidebarOpen, '-translate-x-full': !isSidebarOpen}"
+    >
+      <!-- Ornamen Dekoratif Islami Beranimasi -->
+      <div class="absolute -top-[20%] -right-[10%] w-[350px] h-[350px] bg-emerald-600 rounded-full blur-[80px] opacity-40 animate-blob1"></div>
+      <div class="absolute -bottom-[10%] -left-[10%] w-[300px] h-[300px] bg-yellow-500 rounded-full blur-[100px] opacity-30 animate-blob2"></div>
+      
+      <div class="hidden md:flex items-center gap-3 mb-10 relative z-10">
+        <div class="bg-gradient-to-br from-yellow-400 to-yellow-500 p-2 rounded-xl shadow ring-2 ring-emerald-700">
+          <span class="text-3xl text-emerald-900">🕌</span>
+        </div>
+        <div>
+          <h2 class="text-2xl font-poppins font-bold text-white tracking-wide">Portal Guru</h2>
+          <p class="text-xs text-emerald-100 font-medium">LMS PAI</p>
+        </div>
+      </div>
+
+      <ul class="space-y-4 relative z-10 text-[15px] font-bold tracking-wide flex-grow mt-6 md:mt-0">
+        <li>
+          <router-link to="/admin/dashboard" @click="isSidebarOpen = false" class="flex items-center gap-4 text-white bg-emerald-700/60 p-4 rounded-xl shadow-inner border border-emerald-500/30 backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+            <span class="text-xl">📖</span> Dashboard
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/admin/materi/tambah" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
+            <span class="text-xl">✍️</span> Tambah/Edit Materi
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/admin/kehadiran" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
+            <span class="text-xl">📊</span> Data Nilai Siswa
+          </router-link>
+        </li>
+      </ul>
+
+      <div class="mt-12 pt-6 border-t border-emerald-700/50 relative z-10">
+        <button @click="logout" class="w-full flex items-center justify-center gap-3 text-red-100 hover:text-white bg-red-900/40 hover:bg-red-600 p-4 rounded-xl transition-all text-left font-bold shadow hover:shadow-lg hover:-translate-y-1 border border-red-800/30">
+          <span class="text-xl">🔒</span> Log Keluar
+        </button>
+      </div>
+    </div>
+    
+    <!-- Mobile Overlay Black (Tutup sidebar klik luar) -->
+    <div v-if="isSidebarOpen" @click="isSidebarOpen = false" class="fixed inset-0 bg-black/50 z-30 md:hidden"></div>
 
     <!-- Konten Utama Dashboard -->
-    <div class="flex-grow bg-white p-6 rounded-lg shadow min-h-[500px]">
-      <div class="flex justify-between items-center mb-6">
-        <h1 class="text-3xl font-bold">Daftar Materi Aktif</h1>
-        <button @click="showAddModal = true" class="bg-indigo-600 text-white px-4 py-2 rounded shadow hover:bg-indigo-700">+ Tambah Cepat</button>
+    <div class="flex-grow p-6 md:p-10 lg:p-14 relative overflow-y-auto w-full">
+      
+      <!-- Ornamen Dekoratif di Konten -->
+      <div class="absolute top-0 right-0 p-8 opacity-5 pointer-events-none text-9xl">🌿</div>
+      
+      <div class="mb-10 text-center md:text-left animate-fadeInDown">
+        <h1 class="text-4xl md:text-5xl font-poppins font-bold text-emerald-900 mb-2">Selamat Datang, Guru PAI!</h1>
+        <p class="text-emerald-700 font-medium text-lg max-w-xl">Berikut adalah daftar materi PAI yang tersedia untuk siswa berserta pengaturannya.</p>
       </div>
       
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-slate-100 border-b">
-              <th class="p-3 font-semibold">Judul Materi</th>
-              <th class="p-3 font-semibold text-center w-32">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="mat in materials" :key="mat.id" class="border-b hover:bg-slate-50">
-              <td class="p-3">{{ mat.title }}</td>
-              <td class="p-3 text-center flex gap-2 justify-center">
-                <button class="text-blue-500 hover:text-blue-700">Edit</button>
-                <button class="text-red-500 hover:text-red-700">Hapus</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+      <div class="bg-white rounded-2xl border border-slate-200 mb-8 overflow-hidden z-10 relative animate-slideUp">
+        <!-- Kepala Tabel Styling -->
+        <div class="bg-slate-50 p-6 flex items-center justify-between border-b border-slate-200">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl text-emerald-700">📚</span>
+            <h3 class="text-emerald-900 font-bold text-xl font-poppins">Daftar Materi PAI</h3>
+          </div>
+          <router-link to="/admin/materi/tambah" class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold px-6 py-2.5 rounded-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg text-sm flex items-center gap-2">
+            <span>+</span> Tambah Materi
+          </router-link>
+        </div>
 
-    <!-- Modal "Tambah Cepat" -->
-    <div v-if="showAddModal" class="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-      <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg">
-        <h3 class="text-2xl font-bold mb-4">Materi Baru</h3>
-        <input v-model="newMaterial.title" type="text" class="w-full border p-2 mb-4 rounded" placeholder="Judul Materi...">
-        <textarea v-model="newMaterial.content" class="w-full border p-2 mb-4 rounded h-32" placeholder="Isi materi..."></textarea>
-        <div class="flex gap-2 justify-end">
-          <button @click="showAddModal = false" class="bg-gray-200 px-4 py-2 rounded">Batal</button>
-          <button @click="saveMaterial" class="bg-green-600 text-white px-4 py-2 rounded">Simpan Info</button>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse min-w-[600px]">
+            <thead>
+              <tr class="bg-white text-emerald-800 text-sm uppercase border-b border-slate-200 text-center">
+                <th class="p-5 font-bold text-left pl-8">Sampul Visual</th>
+                <th class="p-5 font-bold text-left">Topik Kajian / Bab</th>
+                <th class="p-5 font-bold w-40 pr-8">Aksi Cepat</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr v-for="(mat, idx) in materials" :key="mat.id" class="hover:bg-slate-50 transition-colors">
+                <td class="p-4 pl-8 w-40">
+                  <div class="w-24 h-24 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 relative">
+                    <img v-if="mat.image_url" :src="mat.image_url" class="absolute inset-0 w-full h-full object-cover" />
+                    <div v-else class="absolute inset-0 flex items-center justify-center flex-col bg-slate-100">
+                      <span class="text-2xl opacity-40">📖</span>
+                    </div>
+                  </div>
+                </td>
+                <td class="p-5 py-6 align-top">
+                  <p class="font-bold text-xl text-emerald-900 mb-2">{{ mat.title }}</p>
+                  <p class="text-sm text-slate-500 line-clamp-2 max-w-lg">{{ mat.content || 'Catatan tidak tersedia' }}</p>
+                  <div class="mt-3">
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full inline-block">Dipublish ✓</span>
+                  </div>
+                </td>
+                <td class="p-5 pr-8 align-middle">
+                  <div class="flex flex-col gap-2">
+                    <button @click="router.push('/admin/materi/edit/' + mat.id)" class="px-4 py-2 w-full bg-emerald-50 text-emerald-700 rounded-lg text-sm font-bold border border-emerald-200 hover:bg-emerald-100 transition-all duration-300 hover:shadow transform hover:-translate-y-0.5">✏️ Edit</button>
+                    <button @click="handleDelete(mat.id)" class="px-4 py-2 w-full bg-red-50 text-red-600 rounded-lg text-sm font-bold border border-red-100 hover:bg-red-100 transition-all duration-300 hover:shadow transform hover:-translate-y-0.5">🗑️ Hapus</button>
+                  </div>
+                </td>
+              </tr>
+              <tr v-if="materials.length === 0">
+                <td colspan="3" class="p-16 text-center">
+                  <div class="text-6xl mb-4 opacity-30">🕌</div>
+                  <p class="text-slate-600 font-bold text-lg">Data materi PAI masih kosong.</p>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
