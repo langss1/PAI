@@ -41,6 +41,12 @@ const logout = () => {
     router.push('/admin/login')
   }
 }
+
+const handleDeleteAttendance = async (id) => {
+  if(confirm("Apakah Anda yakin ingin menghapus catatan nilai siswa ini?")) {
+    await store.deleteStudentResult(id)
+  }
+}
 </script>
 
 <template>
@@ -175,9 +181,12 @@ const logout = () => {
                   </span>
                 </td>
                 <td class="p-5 pr-8 text-center">
-                  <div class="w-12 h-12 mx-auto rounded-xl flex items-center justify-center border" :class="student.score >= 70 ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-red-200 bg-red-50 text-red-600'">
+                  <div class="w-12 h-12 mx-auto rounded-xl flex items-center justify-center border mb-2" :class="student.score >= 70 ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-red-200 bg-red-50 text-red-600'">
                     <span class="font-bold text-lg font-mono">{{ student.score }}</span>
                   </div>
+                  <button @click="handleDeleteAttendance(student.id)" class="text-xs font-bold text-red-500 hover:text-red-700 hover:underline">
+                    Hapus
+                  </button>
                 </td>
               </tr>
               <tr v-if="students.filter(s => filterMaterial ? s.materialTitle === filterMaterial : true).length === 0">

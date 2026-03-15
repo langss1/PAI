@@ -24,10 +24,10 @@ const questions = ref(
   }))
 )
 
+const route = useRoute()
 const isEditMode = ref(false)
 
 onMounted(() => {
-  const route = useRoute()
   if(route.params.id) {
     isEditMode.value = true
     const editMat = store.materials.find(m => String(m.id) === String(route.params.id))
@@ -61,8 +61,6 @@ onMounted(() => {
 const submitData = async () => {
   if (!materialForm.value.title) return alert("Peringatan: Judul materi pembelajaran wajib diisi!")
   if (materialForm.value.title.length < 5) return alert("Judul minimal harus berisi 5 huruf atau lebih.")
-  
-  const route = useRoute()
   
   if(isEditMode.value) {
     const success = await store.updateMaterial(route.params.id, {
@@ -275,7 +273,7 @@ const logout = () => {
 
         <!-- Tombol Lempar Publikasi Raksasa -->
         <button @click="submitData" class="w-full flex justify-center py-4 px-4 rounded-xl shadow border border-emerald-600 bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 text-yellow-300 font-poppins font-bold text-lg md:text-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(4,120,87,0.6)] mt-8 tracking-wide">
-          <span>Simpan Materi PAI</span>
+          <span>{{ isEditMode ? 'Simpan Update Materi' : 'Simpan Materi PAI' }}</span>
         </button>
 
       </div>

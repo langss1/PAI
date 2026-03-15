@@ -190,6 +190,21 @@ export const useMainStore = defineStore('main', {
       } catch (e) {
         alert('Gagal lapor nilai ke Supabase! ' + e.message)
       }
+    },
+
+    // 6. Hapus Data Kehadiran / Nilai
+    async deleteStudentResult(id) {
+      if(!id) return;
+      this.loading = true
+      try {
+        const { error } = await supabase.from('student_results').delete().eq('id', id)
+        if (error) throw error
+        this.studentResults = this.studentResults.filter(r => r.id !== id)
+      } catch (e) {
+        alert('Gagal menghapus data kehadiran: ' + e.message)
+      } finally {
+        this.loading = false
+      }
     }
   }
 })

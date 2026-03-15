@@ -10,6 +10,7 @@ CREATE TABLE materials (
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     video_url TEXT,
+    image_url TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -37,5 +38,7 @@ CREATE TABLE student_results (
 );
 
 -- Setel kebijakan Row Level Security (RLS) jika dibutuhkan nanti.
--- Untuk saat MVP (tahap fungsional tanpa rules khusus), Anda bisa matikan RLS 
--- di dashboard tabel Supabase, atau biarkan publik bisa baca/tulis sementara.
+-- Untuk saat MVP (tahap fungsional tanpa rules khusus), Anda MATIKAN RLS dengan kode berikut:
+ALTER TABLE "materials" DISABLE ROW LEVEL SECURITY;
+ALTER TABLE "quiz_questions" DISABLE ROW LEVEL SECURITY;
+ALTER TABLE "student_results" DISABLE ROW LEVEL SECURITY;
