@@ -60,7 +60,7 @@ const handleLogin = async () => {
         <div class="inline-flex items-center justify-center w-20 h-20 bg-emerald-800 rounded-full mb-6">
           <span class="text-yellow-400 text-4xl z-10 font-bold">🕌</span>
         </div>
-        <h1 class="text-4xl lg:text-5xl font-poppins font-bold text-emerald-900 tracking-tight leading-tight">EduCivIslam</h1>
+        <h1 class="text-4xl lg:text-5xl font-poppins font-bold text-emerald-900 tracking-tight leading-tight">PAI HUB</h1>
         <p class="text-emerald-700 font-medium mt-3 text-lg tracking-wide uppercase">Portal Guru PAI</p>
       </div>
 

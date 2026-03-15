@@ -13,7 +13,7 @@ const materials = computed(() => store.materials)
       <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
         <div class="flex items-center gap-3">
           <div class="bg-yellow-400 p-2 rounded-lg"><span class="text-emerald-900 font-black text-xl leading-none">PAI</span></div>
-          <h1 class="text-2xl font-black tracking-wide">LMS Islami</h1>
+          <h1 class="text-2xl font-black tracking-wide">HUB</h1>
         </div>
         <router-link to="/admin/login" class="text-emerald-100 hover:text-white font-semibold text-sm bg-emerald-700/50 px-4 py-2 rounded-full transition border border-emerald-500/30">
           Login Guru &rarr;
