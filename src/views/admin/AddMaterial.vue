@@ -58,6 +58,42 @@ onMounted(() => {
   }
 })
 
+const handleImageUpload = async (e) => {
+  const file = e.target.files[0]
+  if(!file) return
+  
+  try {
+    const img = new Image()
+    img.src = URL.createObjectURL(file)
+    await new Promise((resolve, reject) => {
+      img.onload = resolve
+      img.onerror = reject
+    })
+    
+    const canvas = document.createElement('canvas')
+    const MAX_WIDTH = 800
+    let scaleSize = 1
+    
+    // Jangan perbesar gambar kecil, hanya perkecil gambar besar
+    if (img.width > MAX_WIDTH) {
+      scaleSize = MAX_WIDTH / img.width
+      canvas.width = MAX_WIDTH
+      canvas.height = img.height * scaleSize
+    } else {
+      canvas.width = img.width
+      canvas.height = img.height
+    }
+    
+    const ctx = canvas.getContext('2d')
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+    
+    // Update ref secara eksplisit dengan .value
+    materialForm.value.imageUrl = canvas.toDataURL('image/jpeg', 0.7)
+  } catch(err) {
+    alert("Gagal memproses gambar saat di-upload: " + err.message)
+  }
+}
+
 const submitData = async () => {
   if (!materialForm.value.title) return alert("Peringatan: Judul materi pembelajaran wajib diisi!")
   if (materialForm.value.title.length < 5) return alert("Judul minimal harus berisi 5 huruf atau lebih.")
@@ -190,24 +226,11 @@ const logout = () => {
             </div>
             <div class="group">
               <label class="block font-bold text-emerald-800 text-sm mb-2">Upload Gambar Representasi</label>
-              <input type="file" accept="image/*" @change="async (e) => { 
-                const file = e.target.files[0]; 
-                if(!file) return;
-                
-                // Compress image down to canvas to prevent Supabase POST size limit error
-                const img = new Image();
-                img.src = URL.createObjectURL(file);
-                await new Promise(r => img.onload = r);
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 800; // Resize agar ringan
-                const scaleSize = MAX_WIDTH / img.width;
-                canvas.width = MAX_WIDTH;
-                canvas.height = img.height * scaleSize;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                materialForm.imageUrl = canvas.toDataURL('image/jpeg', 0.6); // 60% quality jpeg
-              }" class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-lg p-3 outline-none transition-colors text-slate-800 font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
-              <p class="text-xs text-slate-500 mt-2" v-if="materialForm.imageUrl">Gambar siap dipublish ✓</p>
+              <input type="file" accept="image/*" @change="handleImageUpload" class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-lg p-3 outline-none transition-colors text-slate-800 font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
+              <div v-if="materialForm.imageUrl" class="mt-4">
+                <p class="text-xs text-emerald-600 font-bold mb-2">✓ Gambar Siap Dipublish:</p>
+                <img :src="materialForm.imageUrl" class="h-24 w-auto rounded border border-emerald-200 shadow-sm object-cover" />
+              </div>
             </div>
           </div>
 
