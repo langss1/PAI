@@ -26,7 +26,7 @@ const handleDelete = async (id) => {
 <template>
   <div class="min-h-screen bg-slate-50 flex flex-col md:flex-row shadow-inner text-slate-800 w-full">
     
-    <!-- Mobile Header (Hanya tampil di HP) -->
+    <!-- Mobile Header -->
     <div class="md:hidden bg-gradient-to-r from-emerald-800 to-emerald-900 text-white p-4 flex justify-between items-center shadow-md relative z-50">
       <div class="flex items-center gap-2">
         <span class="text-2xl">🕌</span>
@@ -38,12 +38,11 @@ const handleDelete = async (id) => {
       </button>
     </div>
 
-    <!-- Sidebar / Navigasi Admin Beranimasi -->
+    <!-- Sidebar -->
     <div 
       class="fixed inset-y-0 left-0 transform md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-40 w-72 bg-gradient-to-br from-emerald-800 via-emerald-900 to-yellow-600 animate-gradient animate-fadeInLeft text-white p-8 flex flex-col shadow-2xl overflow-y-auto"
       :class="{'translate-x-0': isSidebarOpen, '-translate-x-full': !isSidebarOpen}"
     >
-      <!-- Ornamen Dekoratif Islami Beranimasi -->
       <div class="absolute -top-[20%] -right-[10%] w-[350px] h-[350px] bg-emerald-600 rounded-full blur-[80px] opacity-40 animate-blob1"></div>
       <div class="absolute -bottom-[10%] -left-[10%] w-[300px] h-[300px] bg-yellow-500 rounded-full blur-[100px] opacity-30 animate-blob2"></div>
       
@@ -76,39 +75,43 @@ const handleDelete = async (id) => {
       </ul>
 
       <div class="mt-12 pt-6 border-t border-emerald-700/50 relative z-10">
-        <button @click="logout" class="w-full flex items-center justify-center gap-3 text-red-100 hover:text-white bg-red-900/40 hover:bg-red-600 p-4 rounded-xl transition-all text-left font-bold shadow hover:shadow-lg hover:-translate-y-1 border border-red-800/30">
+        <button @click="logout" class="w-full flex items-center justify-center gap-3 text-red-100 hover:text-white bg-red-900/40 hover:bg-red-600 p-4 rounded-xl transition-all font-bold shadow hover:shadow-lg hover:-translate-y-1 border border-red-800/30">
           <span class="text-xl">🔒</span> Log Keluar
         </button>
       </div>
     </div>
     
-    <!-- Mobile Overlay Black (Tutup sidebar klik luar) -->
+    <!-- Mobile Overlay -->
     <div v-if="isSidebarOpen" @click="isSidebarOpen = false" class="fixed inset-0 bg-black/50 z-30 md:hidden"></div>
 
-    <!-- Konten Utama Dashboard -->
-    <div class="flex-grow p-6 md:p-10 lg:p-14 relative overflow-y-auto w-full">
+    <!-- Konten Utama -->
+    <div class="flex-grow p-4 md:p-10 lg:p-14 relative overflow-y-auto w-full">
       
-      <!-- Ornamen Dekoratif di Konten -->
       <div class="absolute top-0 right-0 p-8 opacity-5 pointer-events-none text-9xl">🌿</div>
       
-      <div class="mb-10 text-center md:text-left animate-fadeInDown">
-        <h1 class="text-4xl md:text-5xl font-poppins font-bold text-emerald-900 mb-2">Selamat Datang, Guru PAI!</h1>
-        <p class="text-emerald-700 font-medium text-lg max-w-xl">Berikut adalah daftar materi PAI yang tersedia untuk siswa berserta pengaturannya.</p>
+      <div class="mb-8 text-center md:text-left animate-fadeInDown">
+        <h1 class="text-3xl md:text-5xl font-poppins font-bold text-emerald-900 mb-2">Selamat Datang, Guru PAI!</h1>
+        <p class="text-emerald-700 font-medium text-base md:text-lg max-w-xl">Berikut adalah daftar materi PAI yang tersedia untuk siswa berserta pengaturannya.</p>
       </div>
       
       <div class="bg-white rounded-2xl border border-slate-200 mb-8 overflow-hidden z-10 relative animate-slideUp">
-        <!-- Kepala Tabel Styling -->
-        <div class="bg-slate-50 p-6 flex items-center justify-between border-b border-slate-200">
+        
+        <!-- Header Tabel -->
+        <div class="bg-slate-50 p-4 md:p-6 flex items-center justify-between border-b border-slate-200">
           <div class="flex items-center gap-3">
             <span class="text-2xl text-emerald-700">📚</span>
-            <h3 class="text-emerald-900 font-bold text-xl font-poppins">Daftar Materi PAI</h3>
+            <h3 class="text-emerald-900 font-bold text-lg md:text-xl font-poppins">Daftar Materi PAI</h3>
           </div>
-          <router-link to="/admin/materi/tambah" class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold px-6 py-2.5 rounded-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg text-sm flex items-center gap-2">
-            <span>+</span> Tambah Materi
+          <router-link 
+            to="/admin/materi/tambah" 
+            class="bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-bold px-4 md:px-6 py-2 md:py-2.5 rounded-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg text-sm flex items-center gap-1"
+          >
+            <span>+</span> <span class="hidden sm:inline">Tambah Materi</span>
           </router-link>
         </div>
 
-        <div class="overflow-x-auto">
+        <!-- ── TABEL: hanya tampil di md ke atas ── -->
+        <div class="hidden md:block overflow-x-auto">
           <table class="w-full text-left border-collapse min-w-[600px]">
             <thead>
               <tr class="bg-white text-emerald-800 text-sm uppercase border-b border-slate-200 text-center">
@@ -118,11 +121,11 @@ const handleDelete = async (id) => {
               </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
-              <tr v-for="(mat, idx) in materials" :key="mat.id" class="hover:bg-slate-50 transition-colors">
+              <tr v-for="mat in materials" :key="mat.id" class="hover:bg-slate-50 transition-colors">
                 <td class="p-4 pl-8 w-40">
                   <div class="w-24 h-24 rounded-lg overflow-hidden border border-slate-200 bg-slate-100 relative">
                     <img v-if="mat.image_url" :src="mat.image_url" class="absolute inset-0 w-full h-full object-cover" />
-                    <div v-else class="absolute inset-0 flex items-center justify-center flex-col bg-slate-100">
+                    <div v-else class="absolute inset-0 flex items-center justify-center bg-slate-100">
                       <span class="text-2xl opacity-40">📖</span>
                     </div>
                   </div>
@@ -136,8 +139,8 @@ const handleDelete = async (id) => {
                 </td>
                 <td class="p-5 pr-8 align-middle">
                   <div class="flex flex-col gap-2">
-                    <button @click="router.push('/admin/materi/edit/' + mat.id)" class="px-4 py-2 w-full bg-emerald-50 text-emerald-700 rounded-lg text-sm font-bold border border-emerald-200 hover:bg-emerald-100 transition-all duration-300 hover:shadow transform hover:-translate-y-0.5">✏️ Edit</button>
-                    <button @click="handleDelete(mat.id)" class="px-4 py-2 w-full bg-red-50 text-red-600 rounded-lg text-sm font-bold border border-red-100 hover:bg-red-100 transition-all duration-300 hover:shadow transform hover:-translate-y-0.5">🗑️ Hapus</button>
+                    <button @click="router.push('/admin/materi/edit/' + mat.id)" class="px-4 py-2 w-full bg-emerald-50 text-emerald-700 rounded-lg text-sm font-bold border border-emerald-200 hover:bg-emerald-100 transition-all hover:shadow transform hover:-translate-y-0.5">✏️ Edit</button>
+                    <button @click="handleDelete(mat.id)" class="px-4 py-2 w-full bg-red-50 text-red-600 rounded-lg text-sm font-bold border border-red-100 hover:bg-red-100 transition-all hover:shadow transform hover:-translate-y-0.5">🗑️ Hapus</button>
                   </div>
                 </td>
               </tr>
@@ -149,6 +152,53 @@ const handleDelete = async (id) => {
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <!-- ── CARD LIST: hanya tampil di mobile (< md) ── -->
+        <div class="md:hidden divide-y divide-slate-100">
+
+          <div v-if="materials.length === 0" class="p-12 text-center">
+            <div class="text-5xl mb-3 opacity-30">🕌</div>
+            <p class="text-slate-600 font-bold">Data materi PAI masih kosong.</p>
+          </div>
+
+          <div 
+            v-for="mat in materials" 
+            :key="mat.id"
+            class="p-4 flex gap-4 items-start hover:bg-slate-50 transition-colors"
+          >
+            <!-- Sampul Visual -->
+            <div class="w-20 h-20 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex-shrink-0 relative">
+              <img v-if="mat.image_url" :src="mat.image_url" class="absolute inset-0 w-full h-full object-cover" />
+              <div v-else class="absolute inset-0 flex items-center justify-center bg-slate-100">
+                <span class="text-2xl opacity-40">📖</span>
+              </div>
+            </div>
+
+            <!-- Topik Kajian + Aksi -->
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-emerald-900 text-base leading-snug line-clamp-2 mb-1">{{ mat.title }}</p>
+              <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-2">{{ mat.content || 'Catatan tidak tersedia' }}</p>
+              <span class="text-xs font-bold text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded-full inline-block mb-3">Dipublish ✓</span>
+
+              <!-- Aksi Cepat -->
+              <div class="flex gap-2">
+                <button 
+                  @click="router.push('/admin/materi/edit/' + mat.id)" 
+                  class="flex-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold py-2 border border-emerald-200 hover:bg-emerald-100 transition-all active:scale-95"
+                >
+                  ✏️ Edit
+                </button>
+                <button 
+                  @click="handleDelete(mat.id)" 
+                  class="flex-1 bg-red-50 text-red-600 rounded-lg text-xs font-bold py-2 border border-red-100 hover:bg-red-100 transition-all active:scale-95"
+                >
+                  🗑️ Hapus
+                </button>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

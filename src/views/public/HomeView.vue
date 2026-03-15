@@ -39,7 +39,7 @@ const materials = computed(() => store.materials)
         <div 
           v-for="(mat, idx) in materials" 
           :key="mat.id"
-          class="bg-white rounded-3xl overflow-hidden shadow-lg shadow-slate-200/50 hover:shadow-2xl transition duration-500 transform hover:-translate-y-2 border border-slate-100 flex flex-col animate-[slideUp_0.5s_ease-out]"
+          class="bg-white rounded-3xl overflow-hidden shadow-lg shadow-emerald-200/60 hover:shadow-2xl hover:shadow-emerald-300/50 transition duration-500 transform hover:-translate-y-2 border border-emerald-100 outline outline-2 outline-emerald-100 hover:outline-emerald-400 flex flex-col animate-[slideUp_0.5s_ease-out]"
           :style="{ animationDelay: `${idx * 0.15}s` }"
         >
           <div class="h-48 bg-emerald-50 relative overflow-hidden flex-shrink-0">
