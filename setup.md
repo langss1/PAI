@@ -1,47 +1,59 @@
-# Proyek PAI - Vue 3 + Vite & Supabase
+# Setup Mini LMS Web (PAI)
 
-Proyek ini dibangun menggunakan Vite, Vue 3, TailwindCSS, dan Supabase. Panduan ini akan membantu Anda dalam melakukan inisialisasi dan pengaturan proyek di komputer lokal Anda.
-
-## Daftar Isi
-1. [Prasyarat](#prasyarat)
-2. [Instalasi Proyek](#instalasi-proyek)
-3. [Setup Environment Variables (Koneksi Database)](#setup-environment-variables)
-4. [Menjalankan Development Server](#menjalankan-development-server)
+Dokumen ini berisi langkah-langkah setup awal agar project bisa dijalankan dengan lancar tanpa error terkait versi package atau library. Project ini dibangun menggunakan **Vue 3 (Composition API)**, **Vite**, **Tailwind CSS v4**, **Vue Router**, **Pinia** (State Management), dan **Supabase**.
 
 ---
 
-## 1. Prasyarat
-Pastikan Anda sudah menginstal:
-- [Node.js](https://nodejs.org/) (disarankan versi LTS terbaru)
-- Package manager (npm bawaan Node.js, atau pnpm/yarn)
+## 1. Persiapan Awal
+Pastikan di komputer sudah terinstal:
+- **Node.js** (Disarankan versi LTS terbaru, minimal Node 20.x).
+- Package manager seperti `npm` (sudah bawaan Node.js).
 
-## 2. Instalasi Proyek
-Masuk ke dalam folder proyek dan instal seluruh dependency (termasuk Vue, TailwindCSS, dan `@supabase/supabase-js`.
+## 2. Kloning Repository
+Buka terminal, lalu clone dan masuk ke direktori utama project:
+```bash
+git clone <URL_REPO>
+cd pai
+```
+
+## 3. Instalasi Dependencies Wajib
+Jalankan perintah berikut untuk menginstal seluruh dependency yang dibutuhkan:
 
 ```bash
-cd pai
 npm install
 ```
 
-## 3. Setup Environment Variables (Koneksi Database)
-Proyek ini membutuhkan koneksi ke database Supabase.
+> **Catatan:**
+> Proses instalasi di atas sangat krusial karena akan menginstal library penting berikut:
+> - `vue-router`: Untuk navigasi halaman (Siswa dan Admin).
+> - `pinia`: Untuk manajemen state (menyimpan sementara data nilai kuis secara reaktif dan real-time menggunakan localStorage).
+> - `@tailwindcss/vite`: Plugin wajib untuk mengintegrasikan Tailwind CSS v4 dengan Vite.
+> - `@supabase/supabase-js`: Client untuk koneksi ke database.
 
-1. Buat file baru bernama `.env` di root folder proyek (sejajar dengan `package.json`).
-2. Minta kredensial Supabase (URL dan Anon Key) dari Lead Developer (atau buat project Supabase baru Anda sendiri di [supabase.com](https://supabase.com)).
-3. Isi file `.env` dengan format berikut:
+## 4. Setup Environment Variables (Koneksi Supabase)
+Project ini membutuhkan kredensial untuk terkoneksi ke database Supabase.
+1. Di root folder (sejajar dengan `package.json`), **buat file baru** bernama `.env`.
+2. Buka file `.env.example` sebagai referensi.
+3. Salin isi format dari `.env.example` ke dalam `.env`.
+4. Isi nilainya dengan kredensial Supabase URL dan Anon Key yang sesungguhnya (bisa diminta ke Lead/Penanggung jawab DB):
+   ```env
+   VITE_SUPABASE_URL=kunci_url_asli_disini
+   VITE_SUPABASE_ANON_KEY=kunci_anon_key_asli_disini
+   ```
 
-```env
-VITE_SUPABASE_URL=isi_dengan_url_supabase_disini
-VITE_SUPABASE_ANON_KEY=isi_dengan_anon_key_supabase_disini
-```
+*(File `.env` sudah masuk ke `.gitignore` sehingga dipastikan aman dan tidak akan ter-push ke GitHub).*
 
-> **Catatan**: File `.env` sudah dimasukkan ke dalam `.gitignore` sehingga aman dan tidak akan ter-commit ke repositori. Kami juga telah menyediakan file `.env.example` sebagai referensi variabel yang dibutuhkan.
+## 5. Sync Skema Database Supabase
+Bagi yang bertugas mengatur database, silakan buka file `database_schema.sql` di root project. Salin seluruh teks SQL di dalamnya, lalu paste dan *Run* di **SQL Editor** pada menu dashboard [Supabase](https://supabase.com).
 
-## 4. Menjalankan Development Server
-Setelah instalasi selesai dan environment variable telah di-set, Anda dapat menjalankan server lokal Vite.
+## 6. Menjalankan Development Server
+Setelah instalasi dependency (langkah 3) dan environment variables (langkah 4) selesai, jalankan server lokal:
 
 ```bash
 npm run dev
 ```
 
-Buka URL yang ditampilkan di terminal (biasanya `http://localhost:5173`) pada browser Anda untuk melihat aplikasi PAI.
+Buka URL yang muncul di terminal (contoh: `http://localhost:5173/`) pada browser. Aplikasi Mini LMS Web MVP Anda sudah berjalan.
+
+> **Status MVP Saat Ini**
+> Fungsionalitas pembuatan materi oleh Guru dan rekap nilai kuis dari Siswa saat ini disimulasikan menggunakan integrasi `Pinia + LocalStorage`. Data akan tersimpan di dalam cache memori browser secara otomatis. Pengunaan tabel asli Supabase via Fetch akan dilakukan pada tahap selanjutnya setelah UI & Flow MVP selesai dites.
