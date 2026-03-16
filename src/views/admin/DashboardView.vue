@@ -160,6 +160,11 @@ const doDelete = async () => {
             <span class="text-xl">📊</span> Data Nilai Siswa
           </router-link>
         </li>
+        <li>
+          <router-link to="/admin/kategori" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
+            <span class="text-xl">🏷️</span> Kelola Kategori
+          </router-link>
+        </li>
       </ul>
 
       <div class="mt-12 pt-6 border-t border-emerald-700/50 relative z-10">

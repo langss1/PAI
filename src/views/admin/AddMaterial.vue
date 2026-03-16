@@ -10,7 +10,8 @@ const materialForm = ref({
   title: '',
   content: '',
   videoUrl: '',
-  imageUrl: ''
+  imageUrl: '',
+  category: ''
 })
 
 const questions = ref(
@@ -54,6 +55,7 @@ onMounted(() => {
       materialForm.value.content = editMat.content
       materialForm.value.videoUrl = editMat.video_url || ''
       materialForm.value.imageUrl = editMat.image_url || ''
+      materialForm.value.category = editMat.category || ''
       
       if(editMat.quiz_questions && editMat.quiz_questions.length > 0) {
         let loadedQ = editMat.quiz_questions.map(q => ({
@@ -86,6 +88,7 @@ const submitData = async () => {
       content: materialForm.value.content || ' ',
       videoUrl: materialForm.value.videoUrl,
       imageUrl: materialForm.value.imageUrl, 
+      category: materialForm.value.category,
       questions: questions.value 
     })
     if(success) {
@@ -98,6 +101,7 @@ const submitData = async () => {
       content: materialForm.value.content || ' ',
       videoUrl: materialForm.value.videoUrl,
       imageUrl: materialForm.value.imageUrl, 
+      category: materialForm.value.category,
       questions: questions.value 
     })
     if(success) {
@@ -229,6 +233,11 @@ const isSidebarOpen = ref(false)
             <span class="text-xl">📊</span> Data Nilai Siswa
           </router-link>
         </li>
+        <li>
+          <router-link to="/admin/kategori" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
+            <span class="text-xl">🏷️</span> Kelola Kategori
+          </router-link>
+        </li>
       </ul>
 
       <div class="mt-12 pt-6 border-t border-emerald-700/50 relative z-10">
@@ -287,9 +296,18 @@ const isSidebarOpen = ref(false)
             </div>
           </div>
 
-          <div class="mb-8">
-            <label class="block font-bold text-emerald-800 text-sm mb-2">Video Edukasi (Tautan YouTube)</label>
-            <input v-model="materialForm.videoUrl" type="url" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-lg p-4 outline-none transition-colors text-slate-800 font-medium">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <div class="group">
+              <label class="block font-bold text-emerald-800 text-sm mb-2">Pilih Kategori / Topik (#)</label>
+              <select v-model="materialForm.category" class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-lg p-4 outline-none transition-colors text-slate-800 font-bold">
+                <option value="">Tanpa Kategori</option>
+                <option v-for="cat in store.categories" :key="cat.id" :value="cat.name">#{{ cat.name }}</option>
+              </select>
+            </div>
+            <div class="group">
+              <label class="block font-bold text-emerald-800 text-sm mb-2">Video Edukasi (Tautan YouTube)</label>
+              <input v-model="materialForm.videoUrl" type="url" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-lg p-4 outline-none transition-colors text-slate-800 font-medium">
+            </div>
           </div>
           
           <div class="mb-6">

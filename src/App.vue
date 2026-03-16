@@ -7,6 +7,7 @@ const store = useMainStore()
 onMounted(() => {
   store.fetchMaterials()
   store.fetchStudentResults()
+  store.fetchCategories()
 })
 </script>
 

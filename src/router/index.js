@@ -7,6 +7,7 @@ import LoginView from '../views/admin/LoginView.vue'
 import DashboardView from '../views/admin/DashboardView.vue'
 import AddMaterial from '../views/admin/AddMaterial.vue'
 import AttendanceView from '../views/admin/AttendanceView.vue'
+import CategoryView from '../views/admin/CategoryView.vue'
 
 const routes = [
   // --- PUBLIC ROUTES (Siswa) ---
@@ -51,6 +52,12 @@ const routes = [
     path: '/admin/kehadiran',
     name: 'Attendance',
     component: AttendanceView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin/kategori',
+    name: 'CategoryManage',
+    component: CategoryView,
     meta: { requiresAuth: true }
   }
 ]

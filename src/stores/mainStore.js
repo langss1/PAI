@@ -5,6 +5,7 @@ export const useMainStore = defineStore('main', {
   state: () => ({
     materials: [],
     studentResults: [],
+    categories: [],
     loading: false
   }),
   
@@ -33,6 +34,18 @@ export const useMainStore = defineStore('main', {
         console.warn('Gagal konek Supabase. Cek .env URL/KEY Asli!', e)
       } finally {
         this.loading = false
+      }
+    },
+
+    // 1b. Fetch Kategori
+    async fetchCategories() {
+      try {
+        const { data, error } = await supabase.from('categories').select('*').order('created_at', { ascending: false })
+        if (data) {
+          this.categories = data
+        }
+      } catch (e) {
+        console.warn('Gagal load kategori: ', e)
       }
     },
 
@@ -204,6 +217,61 @@ export const useMainStore = defineStore('main', {
         alert('Gagal menghapus data kehadiran: ' + e.message)
       } finally {
         this.loading = false
+      }
+    },
+
+    // 7. Tambah Kategori
+    async addCategory(name) {
+      if (!name) return false
+      try {
+        const { data, error } = await supabase.from('categories').insert([{ name }]).select()
+        if (error) throw error
+        if (data && data.length > 0) {
+          this.categories.unshift(data[0])
+          return true
+        }
+      } catch (e) {
+        alert('Gagal tambah kategori: ' + e.message)
+        return false
+      }
+    },
+
+    // 8. Hapus Kategori
+    async deleteCategory(id) {
+      try {
+        const { error } = await supabase.from('categories').delete().eq('id', id)
+        if (error) throw error
+        this.categories = this.categories.filter(c => c.id !== id)
+      } catch (e) {
+        alert('Gagal hapus kategori: ' + e.message)
+      }
+    },
+
+    // 9. Update Bulk Kategori Materi
+    async updateBulkMaterialCategories(materialIds, categoryName) {
+      try {
+        // Hapus kategori dari materi yang sebelumnya memilikinya, namun tidak dicentang (Opsional, tergantung logika)
+        // Disini logikanya update specific materials
+        for (const id of materialIds) {
+          await supabase.from('materials').update({ category: categoryName }).eq('id', id)
+        }
+        await this.fetchMaterials() // reload materi
+        return true
+      } catch (e) {
+        alert('Gagal set kategori ke materi: ' + e.message)
+        return false
+      }
+    },
+
+    // 10. Clear Category for materials missing from list
+    async removeCategoryFromMaterials(materialIds) {
+      try {
+        for (const id of materialIds) {
+          await supabase.from('materials').update({ category: null }).eq('id', id)
+        }
+        await this.fetchMaterials()
+      } catch (e) {
+        console.error(e)
       }
     }
   }

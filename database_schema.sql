@@ -11,6 +11,7 @@ CREATE TABLE materials (
     content TEXT NOT NULL,
     video_url TEXT,
     image_url TEXT,
+    category VARCHAR(100),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
@@ -37,8 +38,17 @@ CREATE TABLE student_results (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Tabel Daftar Kategori (Hashtag)
+CREATE TABLE categories (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL UNIQUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Setel kebijakan Row Level Security (RLS) jika dibutuhkan nanti.
 -- Untuk saat MVP (tahap fungsional tanpa rules khusus), Anda MATIKAN RLS dengan kode berikut:
 ALTER TABLE "materials" DISABLE ROW LEVEL SECURITY;
 ALTER TABLE "quiz_questions" DISABLE ROW LEVEL SECURITY;
 ALTER TABLE "student_results" DISABLE ROW LEVEL SECURITY;
+ALTER TABLE "categories" DISABLE ROW LEVEL SECURITY;
+
