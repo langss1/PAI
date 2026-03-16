@@ -167,11 +167,11 @@ const isSidebarOpen = ref(false)
 <template>
   <div class="min-h-screen bg-slate-50 flex flex-col md:flex-row shadow-inner text-slate-800 w-full relative">
 
-    <!-- ── POPUP NOTIFIKASI ── -->
-    <transition name="popup">
-      <div
-        v-if="popup.show"
-        class="fixed top-5 left-1/2 -translate-x-1/2 z-[999] w-[90vw] max-w-sm px-5 py-4 rounded-2xl shadow-2xl flex items-start gap-3 border"
+<!-- ── POPUP NOTIFIKASI ── -->
+<transition name="popup">
+  <div
+    v-if="popup.show && !isSaving"
+    class="fixed top-5 left-1/2 -translate-x-1/2 z-[999] w-[90vw] max-w-sm px-5 py-4 rounded-2xl shadow-2xl flex items-start gap-3 border"
         :class="popup.type === 'success'
           ? 'bg-emerald-900 border-emerald-600/50 text-white shadow-emerald-900/40'
           : 'bg-red-900 border-red-600/50 text-white shadow-red-900/40'"
@@ -403,11 +403,38 @@ const isSidebarOpen = ref(false)
         v-if="isSaving"
         class="fixed inset-0 z-[9999] bg-emerald-950/60 backdrop-blur-xl flex flex-col items-center justify-center gap-5 text-white"
       >
+        <!-- Pesan sukses di atas spinner -->
+        <transition name="popup">
+          <div
+            v-if="popup.show"
+            class="w-[90vw] max-w-sm px-5 py-4 rounded-2xl shadow-2xl flex items-start gap-3 border mb-2"
+            :class="popup.type === 'success'
+              ? 'bg-emerald-800 border-emerald-600/50 text-white'
+              : 'bg-red-900 border-red-600/50 text-white'"
+          >
+            <div
+              class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-lg"
+              :class="popup.type === 'success' ? 'bg-emerald-600' : 'bg-red-700'"
+            >
+              {{ popup.type === 'success' ? '✅' : '⚠️' }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="font-bold text-sm leading-snug">
+                {{ popup.type === 'success' ? 'Berhasil' : 'Peringatan' }}
+              </p>
+              <p class="text-xs mt-0.5 opacity-80 leading-relaxed">{{ popup.message }}</p>
+            </div>
+          </div>
+        </transition>
+
+        <!-- Spinner -->
         <div class="relative w-24 h-24">
           <div class="absolute inset-0 border-8 border-emerald-200/10 rounded-full"></div>
           <div class="absolute inset-0 border-8 border-yellow-400 rounded-full border-t-transparent animate-spin"></div>
           <div class="absolute inset-0 flex items-center justify-center text-4xl animate-pulse">🕌</div>
         </div>
+
+        <!-- Teks loading -->
         <div class="text-center">
           <p class="text-2xl font-black tracking-widest uppercase bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 to-yellow-500 px-4">Sedang Menyimpan...</p>
           <p class="text-emerald-100/70 text-sm mt-2 font-medium">Mohon tidak menutup halaman ini.</p>
