@@ -142,7 +142,7 @@ const doDelete = async () => {
         </div>
         <div>
           <h2 class="text-2xl font-poppins font-bold text-white tracking-wide">Portal Guru</h2>
-          <p class="text-xs text-emerald-100 font-medium">LMS PAI</p>
+          <p class="text-xs text-emerald-100 font-medium">PAI HUB</p>
         </div>
       </div>
 
