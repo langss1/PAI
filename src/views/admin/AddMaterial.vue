@@ -27,6 +27,7 @@ const questions = ref(
 )
 
 const isEditMode = ref(false)
+const isSaving = ref(false)
 
 // ── State Popup Notifikasi ──
 const popup = ref({ show: false, message: '', type: 'success' })
@@ -121,32 +122,42 @@ const submitData = async () => {
   if (!materialForm.value.title) return showPopup('Peringatan: Judul materi pembelajaran wajib diisi!', 'error')
   if (materialForm.value.title.length < 5) return showPopup('Judul minimal harus berisi 5 huruf atau lebih.', 'error')
   
-  if(isEditMode.value) {
-    const success = await store.updateMaterial(route.params.id, {
-      title: materialForm.value.title,
-      content: materialForm.value.content || ' ',
-      videoUrl: materialForm.value.videoUrl,
-      imageUrl: materialForm.value.imageUrl, 
-      category: materialForm.value.category,
-      questions: questions.value 
-    })
-    if(success) {
-      showPopup('Alhamdulillah! Materi PAI berhasil di-update.', 'success')
-      setTimeout(() => router.push('/admin/dashboard'), 2000)
+  isSaving.value = true
+  try {
+    if(isEditMode.value) {
+      const success = await store.updateMaterial(route.params.id, {
+        title: materialForm.value.title,
+        content: materialForm.value.content || ' ',
+        videoUrl: materialForm.value.videoUrl,
+        imageUrl: materialForm.value.imageUrl, 
+        category: materialForm.value.category,
+        questions: questions.value 
+      })
+      if(success) {
+        showPopup('Alhamdulillah! Materi PAI berhasil di-update.', 'success')
+        setTimeout(() => router.push('/admin/dashboard'), 2000)
+      } else {
+        isSaving.value = false
+      }
+    } else {
+      const success = await store.addMaterial({
+        title: materialForm.value.title,
+        content: materialForm.value.content || ' ',
+        videoUrl: materialForm.value.videoUrl,
+        imageUrl: materialForm.value.imageUrl, 
+        category: materialForm.value.category,
+        questions: questions.value 
+      })
+      if(success) {
+        showPopup('Alhamdulillah! Materi PAI dan susunan Kuis berhasil diterbitkan.', 'success')
+        setTimeout(() => router.push('/admin/dashboard'), 2000)
+      } else {
+        isSaving.value = false
+      }
     }
-  } else {
-    const success = await store.addMaterial({
-      title: materialForm.value.title,
-      content: materialForm.value.content || ' ',
-      videoUrl: materialForm.value.videoUrl,
-      imageUrl: materialForm.value.imageUrl, 
-      category: materialForm.value.category,
-      questions: questions.value 
-    })
-    if(success) {
-      showPopup('Alhamdulillah! Materi PAI dan susunan Kuis berhasil diterbitkan.', 'success')
-      setTimeout(() => router.push('/admin/dashboard'), 2000)
-    }
+  } catch (err) {
+    showPopup('Terjadi kesalahan saat menyimpan data.', 'error')
+    isSaving.value = false
   }
 }
 
@@ -204,6 +215,24 @@ const isSidebarOpen = ref(false)
             </div>
           </div>
         </transition>
+      </div>
+    </transition>
+
+    <!-- ── OVERLAY LOADING ── -->
+    <transition name="overlay-fade">
+      <div
+        v-if="isSaving"
+        class="fixed inset-0 z-[1000] bg-emerald-900/40 backdrop-blur-md flex flex-col items-center justify-center gap-5 text-white"
+      >
+        <div class="relative w-20 h-20">
+          <div class="absolute inset-0 border-4 border-emerald-200/20 rounded-full"></div>
+          <div class="absolute inset-0 border-4 border-yellow-400 rounded-full border-t-transparent animate-spin"></div>
+          <div class="absolute inset-0 flex items-center justify-center text-3xl animate-pulse">🕌</div>
+        </div>
+        <div class="text-center">
+          <p class="text-xl font-black tracking-widest uppercase">Sedang Menyimpan...</p>
+          <p class="text-emerald-100/70 text-sm mt-1">Harap tunggu sebentar, data sedang diproses.</p>
+        </div>
       </div>
     </transition>
 
@@ -368,8 +397,19 @@ const isSidebarOpen = ref(false)
         </section>
 
         <!-- Tombol Simpan -->
-        <button @click="submitData" class="w-full flex justify-center py-4 px-4 rounded-xl shadow border border-emerald-600 bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 text-yellow-300 font-poppins font-bold text-lg md:text-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(4,120,87,0.6)] mt-8 tracking-wide">
-          Simpan Materi PAI
+        <button 
+          @click="submitData" 
+          :disabled="isSaving"
+          class="w-full flex justify-center py-4 px-4 rounded-xl shadow border border-emerald-600 bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 text-yellow-300 font-poppins font-bold text-lg md:text-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(4,120,87,0.6)] mt-8 tracking-wide disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+        >
+          <span v-if="!isSaving">Simpan Materi PAI</span>
+          <span v-else class="flex items-center gap-2">
+            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Memproses...
+          </span>
         </button>
 
       </div>
