@@ -172,7 +172,7 @@ const isActiveFilter = computed(() =>
             </transition>
           </div>
         </div>
-      </div>
+      </section>
 
       <!-- Kosong -->
       <div v-if="filteredMaterials.length === 0" class="text-center bg-white p-12 rounded-3xl shadow-sm border border-slate-100 mt-10">
