@@ -239,9 +239,16 @@ export const useMainStore = defineStore('main', {
     // 8. Hapus Kategori
     async deleteCategory(id) {
       try {
+        const categoryToDelete = this.categories.find(c => c.id === id)
+        if (categoryToDelete) {
+          // Clear kategori di tabel materials
+          await supabase.from('materials').update({ category: null }).eq('category', categoryToDelete.name)
+        }
+
         const { error } = await supabase.from('categories').delete().eq('id', id)
         if (error) throw error
         this.categories = this.categories.filter(c => c.id !== id)
+        await this.fetchMaterials() // Refresh materials to reflect changes
       } catch (e) {
         alert('Gagal hapus kategori: ' + e.message)
       }

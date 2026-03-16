@@ -161,6 +161,11 @@ onMounted(async () => {
       </button>
     </div>
 
+    <!-- Mobile Sidebar Backdrop -->
+    <transition name="fade">
+      <div v-if="isSidebarOpen" @click="isSidebarOpen = false" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-30 md:hidden"></div>
+    </transition>
+
     <!-- Sidebar -->
     <div 
       class="fixed inset-y-0 left-0 transform md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-40 w-72 bg-gradient-to-br from-emerald-800 via-emerald-900 to-yellow-600 animate-gradient animate-fadeInLeft text-white p-8 flex flex-col shadow-2xl overflow-y-auto"
@@ -210,11 +215,11 @@ onMounted(async () => {
     </div>
 
     <!-- Main Content -->
-    <main class="flex-grow p-6 md:p-10 lg:p-14 relative w-full lg:max-w-[1400px] overflow-y-auto">
+    <main class="flex-grow p-4 md:p-10 lg:p-14 relative w-full lg:max-w-[1400px] overflow-x-hidden">
       
       <div class="mb-10 animate-fadeInDown">
-        <h1 class="text-4xl md:text-5xl font-poppins font-bold text-emerald-900 mb-2">Kelola Kategori & Tagar #</h1>
-        <p class="text-emerald-700 font-medium text-lg">Buat kategori baru dan tentukan materi mana saja yang masuk ke topik tersebut.</p>
+        <h1 class="text-3xl md:text-5xl font-poppins font-bold text-emerald-900 mb-2 leading-tight">Kelola Kategori & Tagar #</h1>
+        <p class="text-emerald-700 font-medium text-base md:text-lg leading-relaxed">Buat kategori baru dan tentukan materi mana saja yang masuk ke topik tersebut.</p>
       </div>
 
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-10">
@@ -226,27 +231,27 @@ onMounted(async () => {
             <h2 class="text-2xl font-bold text-emerald-900 font-poppins">Daftar Tagar #</h2>
           </div>
 
-          <div class="flex gap-3">
+          <div class="flex flex-col sm:flex-row gap-3">
             <input 
               v-model="newCategoryName" 
               type="text" 
               placeholder="Contoh: dakwah, sunan, fiqih" 
-              class="flex-grow bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-4 outline-none transition-all font-medium"
+              class="flex-grow bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-4 outline-none transition-all font-medium text-sm md:text-base"
               @keyup.enter="handleAddCategory"
             >
-            <button @click="handleAddCategory" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 rounded-xl transition-all shadow-lg shadow-emerald-500/20 active:scale-95">
-              Tambah
+            <button @click="handleAddCategory" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-4 sm:py-0 rounded-xl transition-all shadow-lg shadow-emerald-500/20 active:scale-95 whitespace-nowrap">
+              Tambah Tagar
             </button>
           </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto max-h-[300px] p-2">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 overflow-y-auto max-h-[400px] p-1">
             <div 
               v-for="cat in categories" 
               :key="cat.id"
               class="group bg-slate-50 border border-slate-200 rounded-xl p-4 flex justify-between items-center hover:border-emerald-300 hover:bg-emerald-50 transition-all font-bold text-slate-700"
             >
-              <span class="truncate">#{{ cat.name }}</span>
-              <button @click="askDeleteCategory(cat.id)" class="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+              <span class="truncate pr-2">#{{ cat.name }}</span>
+              <button @click="askDeleteCategory(cat.id)" class="text-slate-300 hover:text-red-500 md:opacity-0 group-hover:opacity-100 transition-all p-1">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
               </button>
             </div>
