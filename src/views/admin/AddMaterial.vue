@@ -255,7 +255,7 @@ const isSidebarOpen = ref(false)
 
       <div class="mt-12 pt-6 border-t border-emerald-700/50 relative z-10">
         <button @click="logout" class="w-full flex items-center justify-center gap-3 text-red-100 hover:text-white bg-red-900/40 hover:bg-red-600 p-4 rounded-xl transition-all font-bold shadow hover:shadow-lg hover:-translate-y-1 border border-red-800/30">
-          <span class="text-xl">🔒</span> Log Keluar
+          <span class="text-xl">🔒</span> Log Out
         </button>
       </div>
     </div>

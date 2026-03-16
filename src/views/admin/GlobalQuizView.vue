@@ -20,18 +20,25 @@ const showPopup = (message, type = 'success') => {
 onMounted(async () => {
   await store.fetchGlobalQuestions()
   if (store.globalQuestions.length > 0) {
-    questions.value = store.globalQuestions.map(q => ({
-      text: q.question_text,
-      optionA: q.option_a,
-      optionB: q.option_b,
-      optionC: q.option_c,
-      optionD: q.option_d,
-      correctAnswer: q.correct_option
-    }))
+    // Filter questions that have actual text to avoid showing empty slots unless explicitly added
+    const existingQuestions = store.globalQuestions
+      .filter(q => q.question_text && q.question_text.trim() !== '')
+      .map(q => ({
+        text: q.question_text,
+        optionA: q.option_a,
+        optionB: q.option_b,
+        optionC: q.option_c,
+        optionD: q.option_d,
+        correctAnswer: q.correct_option
+      }))
+    
+    if (existingQuestions.length > 0) {
+      questions.value = existingQuestions
+    }
   }
   
-  // Ensure we have at least 25 question slots
-  while (questions.value.length < 25) {
+  // Ensure we have at least 1 question slot if none exist or all were empty
+  if (questions.value.length === 0) {
     questions.value.push({
       text: '',
       optionA: '',
@@ -50,16 +57,21 @@ const handleSave = async () => {
   isSaving.value = true
   const success = await store.saveGlobalQuestions(questions.value)
   if (success) {
-    showPopup('Kuis Global berhasil diperbarui!')
+    showPopup('Kuis Global berhasil diperbarui! Mengalihkan...')
     setTimeout(() => {
         isSaving.value = false
-    }, 500)
+        router.push('/admin/dashboard')
+    }, 1500)
   } else {
     isSaving.value = false
   }
 }
 
 const addQuestion = () => {
+  if (questions.value.length >= 25) {
+    showPopup('Maksimal 25 soal.', 'error')
+    return
+  }
   questions.value.push({
     text: '',
     optionA: '',
@@ -95,11 +107,28 @@ const doLogout = () => {
   <div class="min-h-screen bg-slate-50 flex flex-col md:flex-row shadow-inner text-slate-800 w-full relative">
     
     <transition name="popup">
-      <div v-if="popup.show" class="fixed top-5 left-1/2 -translate-x-1/2 z-[999] w-[90vw] max-w-sm px-5 py-4 rounded-2xl shadow-2xl flex items-start gap-3 border backdrop-blur-md" :class="popup.type === 'success' ? 'bg-emerald-900 border-emerald-600/50 text-white' : 'bg-red-900 border-red-600/50 text-white'">
+      <div v-if="popup.show" class="fixed top-5 left-1/2 -translate-x-1/2 z-[1001] w-[90vw] max-w-sm px-5 py-4 rounded-2xl shadow-2xl flex items-start gap-3 border backdrop-blur-md" :class="popup.type === 'success' ? 'bg-emerald-900 border-emerald-600/50 text-white' : 'bg-red-900 border-red-600/50 text-white'">
         <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 bg-opacity-20 bg-white">{{ popup.type === 'success' ? '✅' : '⚠️' }}</div>
         <div class="flex-1 min-w-0">
           <p class="font-bold text-sm">Status</p>
           <p class="text-xs opacity-80">{{ popup.message }}</p>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Logout Confirmation Modal -->
+    <transition name="fade">
+      <div v-if="confirmLogout" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[2000] flex items-center justify-center p-6">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 flex flex-col items-center text-center gap-5 animate-scaleUp">
+          <div class="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center text-4xl mb-2">🔒</div>
+          <div>
+            <h3 class="text-2xl font-black text-slate-800 mb-1">Log Out?</h3>
+            <p class="text-slate-500 font-medium leading-relaxed">Sesi guru akan diakhiri. Anda perlu login kembali untuk mengakses dashboard.</p>
+          </div>
+          <div class="flex gap-3 w-full mt-2">
+            <button @click="confirmLogout = false" class="flex-1 py-4 rounded-xl border-2 border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition-all active:scale-95">Batal</button>
+            <button @click="doLogout" class="flex-1 py-4 rounded-xl bg-red-600 text-white font-bold shadow-lg shadow-red-500/30 hover:bg-red-700 transition-all active:scale-95">Ya, Keluar</button>
+          </div>
         </div>
       </div>
     </transition>
@@ -140,7 +169,7 @@ const doLogout = () => {
         <li><router-link to="/admin/kategori" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white p-4 rounded-xl hover:bg-emerald-700/30 transition-all">🏷️ Kategori</router-link></li>
       </ul>
       <div class="mt-12 pt-6 border-t border-emerald-700/50 relative z-10">
-        <button @click="logout" class="w-full flex items-center justify-center gap-3 text-red-100 bg-red-900/40 p-4 rounded-xl font-bold hover:bg-red-600 hover:text-white transition-all">🔒 Log Keluar</button>
+        <button @click="logout" class="w-full flex items-center justify-center gap-3 text-red-100 bg-red-900/40 p-4 rounded-xl font-bold hover:bg-red-600 hover:text-white transition-all">🔒 Log Out</button>
       </div>
     </div>
 
@@ -201,9 +230,14 @@ const doLogout = () => {
 
     <!-- Loading Overlay -->
     <transition name="fade">
-      <div v-if="isSaving" class="fixed inset-0 z-[10000] bg-emerald-950/80 backdrop-blur-xl flex flex-col items-center justify-center text-white">
-        <div class="text-4xl animate-bounce mb-4">📖</div>
-        <p class="text-2xl font-black uppercase tracking-widest">Menyimpan Data Kuis...</p>
+      <div v-if="isSaving" class="fixed inset-0 z-[10000] bg-emerald-950/90 backdrop-blur-2xl flex flex-col items-center justify-center text-white p-6 text-center">
+        <div class="relative w-24 h-24 mb-8">
+          <div class="absolute inset-0 border-8 border-emerald-500/20 rounded-full"></div>
+          <div class="absolute inset-0 border-8 border-yellow-400 rounded-full border-t-transparent animate-spin"></div>
+          <div class="absolute inset-0 flex items-center justify-center text-4xl animate-pulse">📖</div>
+        </div>
+        <h2 class="text-3xl font-black uppercase tracking-[0.2em] mb-2 bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 to-yellow-500">Menyimpan Kuis</h2>
+        <p class="text-emerald-100/70 font-medium max-w-xs">Mohon tunggu sebentar, data kuis global sedang diperbarui dan Anda akan dialihkan...</p>
       </div>
     </transition>
 
@@ -211,10 +245,23 @@ const doLogout = () => {
 </template>
 
 <style scoped>
-.popup-enter-active, .popup-leave-active { transition: all 0.3s ease; }
+.popup-enter-active, .popup-leave-active { transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
 .popup-enter-from { opacity: 0; transform: translateY(-20px) translateX(-50%); }
 .popup-leave-to { opacity: 0; transform: translateY(-10px) translateX(-50%); }
 
-.fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-scaleUp {
+  animation: scaleUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Custom transitions for a premium feel */
+.list-enter-active, .list-leave-active { transition: all 0.4s ease; }
+.list-enter-from { opacity: 0; transform: translateX(30px); }
+.list-leave-to { opacity: 0; transform: translateX(-30px); }
 </style>
