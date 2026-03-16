@@ -8,6 +8,10 @@ import DashboardView from '../views/admin/DashboardView.vue'
 import AddMaterial from '../views/admin/AddMaterial.vue'
 import AttendanceView from '../views/admin/AttendanceView.vue'
 import CategoryView from '../views/admin/CategoryView.vue'
+import GlobalQuizView from '../views/admin/GlobalQuizView.vue'
+
+// Public Quiz View
+import QuizView from '../views/public/QuizView.vue'
 
 const routes = [
   // --- PUBLIC ROUTES (Siswa) ---
@@ -17,10 +21,13 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/materi/:id',
-    name: 'MaterialDetail',
     component: MaterialDetail,
     props: true
+  },
+  {
+    path: '/kuis',
+    name: 'GlobalQuiz',
+    component: QuizView
   },
 
   // --- ADMIN ROUTES (Guru) ---
@@ -55,9 +62,13 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
-    path: '/admin/kategori',
-    name: 'CategoryManage',
     component: CategoryView,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/admin/kuis',
+    name: 'ManageGlobalQuiz',
+    component: GlobalQuizView,
     meta: { requiresAuth: true }
   }
 ]

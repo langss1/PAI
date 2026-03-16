@@ -54,6 +54,30 @@ const isActiveFilter = computed(() =>
     </header>
 
     <main class="max-w-6xl mx-auto px-4 sm:px-6 mt-12">
+      <!-- ── CTA KUIS UTAMA (GLOBAL) ── -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <div class="bg-gradient-to-br from-emerald-800 to-emerald-950 p-6 md:p-10 rounded-3xl shadow-2xl shadow-emerald-950/40 relative overflow-hidden group border border-emerald-400/20">
+          <!-- Dekorasi -->
+          <div class="absolute -top-[50%] -right-[10%] w-[300px] h-[300px] bg-yellow-400/10 rounded-full blur-[80px] group-hover:bg-yellow-400/20 transition-all duration-700"></div>
+          <div class="absolute -bottom-[30%] -left-[10%] w-[250px] h-[250px] bg-emerald-500/10 rounded-full blur-[60px]"></div>
+
+          <div class="relative flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="text-center md:text-left flex-1">
+              <span class="inline-block px-4 py-1.5 bg-yellow-400 text-yellow-950 rounded-full text-xs font-black tracking-widest uppercase mb-4 shadow-lg shadow-yellow-500/20">Tugas Akhir Guru</span>
+              <h2 class="text-3xl md:text-5xl font-black text-white mb-4 leading-tight tracking-tight">Sudah siap ikuti <span class="text-yellow-400 italic">Ujian Akhir?</span></h2>
+              <p class="text-emerald-100/70 text-base md:text-lg max-w-xl font-medium leading-relaxed">Ukur tingkat pemahamanmu melalui sistem ujian online terintegrasi. Hasilnya akan langsung masuk ke rekap nilai guru.</p>
+            </div>
+            
+            <router-link to="/kuis" class="w-full md:w-auto bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-300 hover:to-yellow-400 text-yellow-950 font-black text-xl py-5 px-10 rounded-2xl shadow-xl shadow-yellow-400/20 transition-all transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-4 group/btn">
+              <span>Mulai Ujian PAI</span>
+              <span class="text-2xl transition-transform group-hover/btn:translate-x-2">🚀</span>
+            </router-link>
+          </div>
+        </div>
+      </section>
+
+      <!-- Search and Filter -->
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
       <!-- Judul -->
       <div class="text-center mb-10 animate-[fadeInDown_0.6s_ease-out]">
         <h2 class="text-3xl md:text-5xl font-extrabold text-slate-800 drop-shadow-sm mb-4">Mari Mulai Belajar!</h2>

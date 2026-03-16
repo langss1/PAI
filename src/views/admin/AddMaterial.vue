@@ -17,16 +17,7 @@ const materialForm = ref({
   category: ''
 })
 
-const questions = ref(
-  Array.from({ length: 10 }).map((_, i) => ({
-    text: '',
-    optionA: '',
-    optionB: '',
-    optionC: '',
-    optionD: '',
-    correctAnswer: 'A'
-  }))
-)
+// Pertanyaan per-materi dihapus, dialihkan ke Kuis Global
 
 const isEditMode = ref(false)
 const isSaving = ref(false)
@@ -90,22 +81,6 @@ onMounted(async () => {
       materialForm.value.videoUrl = editMat.video_url || ''
       materialForm.value.imageUrl = editMat.image_url || ''
       materialForm.value.category = editMat.category || ''
-      
-      if(editMat.quiz_questions && editMat.quiz_questions.length > 0) {
-        let loadedQ = editMat.quiz_questions.map(q => ({
-          id: q.id,
-          text: q.question_text,
-          optionA: q.option_a,
-          optionB: q.option_b,
-          optionC: q.option_c,
-          optionD: q.option_d,
-          correctAnswer: q.correct_option
-        }))
-        while(loadedQ.length < 10) {
-          loadedQ.push({ text: '', optionA: '', optionB: '', optionC: '', optionD: '', correctAnswer: 'A' })
-        }
-        questions.value = loadedQ.slice(0, 10)
-      }
     }
   }
   
@@ -126,8 +101,7 @@ const submitData = async () => {
         content: materialForm.value.content || ' ',
         videoUrl: materialForm.value.videoUrl,
         imageUrl: materialForm.value.imageUrl, 
-        category: materialForm.value.category,
-        questions: questions.value 
+        category: materialForm.value.category
       })
       if(success) {
         showPopup('Alhamdulillah! Materi PAI berhasil di-update.', 'success')
@@ -141,11 +115,10 @@ const submitData = async () => {
         content: materialForm.value.content || ' ',
         videoUrl: materialForm.value.videoUrl,
         imageUrl: materialForm.value.imageUrl, 
-        category: materialForm.value.category,
-        questions: questions.value 
+        category: materialForm.value.category
       })
       if(success) {
-        showPopup('Alhamdulillah! Materi PAI dan susunan Kuis berhasil diterbitkan.', 'success')
+        showPopup('Alhamdulillah! Materi PAI berhasil diterbitkan.', 'success')
         setTimeout(() => router.push('/admin/dashboard'), 2000)
       } else {
         isSaving.value = false
@@ -258,6 +231,11 @@ const isSidebarOpen = ref(false)
           </router-link>
         </li>
         <li>
+          <router-link to="/admin/kuis" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
+            <span class="text-xl">🎓</span> Kelola Kuis Global
+          </router-link>
+        </li>
+        <li>
           <router-link to="/admin/kehadiran" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
             <span class="text-xl">📊</span> Data Nilai Siswa
           </router-link>
@@ -328,51 +306,6 @@ const isSidebarOpen = ref(false)
           <div class="mb-6">
             <label class="block font-bold text-emerald-800 text-sm mb-2">Isi Detail Materi</label>
             <textarea v-model="materialForm.content" placeholder="Masukkan konten materi PAI..." class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-lg p-4 min-h-[250px] outline-none transition-colors text-slate-800 font-medium leading-relaxed resize-y"></textarea>
-          </div>
-        </section>
-
-        <!-- Bagian 2: Soal -->
-        <section class="mb-10 relative z-10 bg-slate-50 border border-slate-200 p-6 md:p-8 rounded-xl">
-          <div class="flex items-center gap-4 border-b border-slate-200 pb-5 mb-8">
-            <div class="w-10 h-10 bg-yellow-100 text-yellow-800 rounded-full flex items-center justify-center text-xl font-bold border border-yellow-200">2</div>
-            <div>
-              <h2 class="text-2xl font-bold font-poppins text-emerald-900">Lembar Evaluasi Soal</h2>
-              <p class="text-slate-500 font-medium text-sm">Buat pertanyaan pilihan ganda untuk materi ini</p>
-            </div>
-          </div>
-
-          <div v-for="(q, index) in questions" :key="index" class="bg-white p-6 rounded-xl mb-6 shadow-sm border border-slate-200">
-            <div class="mb-4">
-              <h3 class="font-bold text-emerald-800">Soal #{{ index + 1 }}</h3>
-            </div>
-            <textarea v-model="q.text" placeholder="Tuliskan soal di sini..." class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-lg p-4 min-h-[100px] outline-none transition-colors mb-4 text-slate-800 resize-y"></textarea>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div class="flex border border-slate-200 rounded-lg overflow-hidden focus-within:border-emerald-500 bg-white">
-                <div class="flex items-center justify-center w-12 bg-slate-100 text-slate-500 font-bold border-r border-slate-200">A</div>
-                <input v-model="q.optionA" type="text" class="w-full outline-none p-3 font-medium text-slate-800" placeholder="Jawaban A">
-              </div>
-              <div class="flex border border-slate-200 rounded-lg overflow-hidden focus-within:border-emerald-500 bg-white">
-                <div class="flex items-center justify-center w-12 bg-slate-100 text-slate-500 font-bold border-r border-slate-200">B</div>
-                <input v-model="q.optionB" type="text" class="w-full outline-none p-3 font-medium text-slate-800" placeholder="Jawaban B">
-              </div>
-              <div class="flex border border-slate-200 rounded-lg overflow-hidden focus-within:border-emerald-500 bg-white">
-                <div class="flex items-center justify-center w-12 bg-slate-100 text-slate-500 font-bold border-r border-slate-200">C</div>
-                <input v-model="q.optionC" type="text" class="w-full outline-none p-3 font-medium text-slate-800" placeholder="Jawaban C">
-              </div>
-              <div class="flex border border-slate-200 rounded-lg overflow-hidden focus-within:border-emerald-500 bg-white">
-                <div class="flex items-center justify-center w-12 bg-slate-100 text-slate-500 font-bold border-r border-slate-200">D</div>
-                <input v-model="q.optionD" type="text" class="w-full outline-none p-3 font-medium text-slate-800" placeholder="Jawaban D">
-              </div>
-            </div>
-            <div class="flex flex-col md:flex-row items-center gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
-              <label class="font-bold text-slate-700">Kunci Jawaban:</label>
-              <select v-model="q.correctAnswer" class="border border-slate-300 bg-white p-2 rounded-lg font-bold text-emerald-800 outline-none focus:border-emerald-500">
-                <option value="A">Jawaban A</option>
-                <option value="B">Jawaban B</option>
-                <option value="C">Jawaban C</option>
-                <option value="D">Jawaban D</option>
-              </select>
-            </div>
           </div>
         </section>
 
