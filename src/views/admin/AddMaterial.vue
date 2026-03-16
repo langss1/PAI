@@ -218,21 +218,6 @@ const isSidebarOpen = ref(false)
       </div>
     </transition>
 
-    <!-- ── OVERLAY LOADING ── -->
-    <transition name="overlay-fade">
-      <div
-        v-if="isSaving"
-        class="fixed inset-0 z-[1000] bg-emerald-900/40 backdrop-blur-md flex flex-col items-center justify-center gap-5 text-white"
-      >
-        <div class="relative w-20 h-20">
-          <div class="absolute inset-0 border-4 border-emerald-200/20 rounded-full"></div>
-          <div class="absolute inset-0 border-4 border-yellow-400 rounded-full border-t-transparent animate-spin"></div>
-          <div class="absolute inset-0 flex items-center justify-center text-3xl animate-pulse">🕌</div>
-        </div>
-        <div class="text-center">
-          <p class="text-xl font-black tracking-widest uppercase">Sedang Menyimpan...</p>
-          <p class="text-emerald-100/70 text-sm mt-1">Harap tunggu sebentar, data sedang diproses.</p>
-        </div>
       </div>
     </transition>
 
@@ -400,7 +385,7 @@ const isSidebarOpen = ref(false)
         <button 
           @click="submitData" 
           :disabled="isSaving"
-          class="w-full flex justify-center py-4 px-4 rounded-xl shadow border border-emerald-600 bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 text-yellow-300 font-poppins font-bold text-lg md:text-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(4,120,87,0.6)] mt-8 tracking-wide disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+          class="w-full flex justify-center py-4 px-4 rounded-xl shadow border border-emerald-600 bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 text-yellow-300 font-poppins font-bold text-lg md:text-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(4,120,87,0.6)] mt-8 tracking-wide disabled:from-slate-400 disabled:to-slate-500 disabled:border-slate-300 disabled:text-slate-100 disabled:shadow-none disabled:transform-none disabled:cursor-not-allowed"
         >
           <span v-if="!isSaving">Simpan Materi PAI</span>
           <span v-else class="flex items-center gap-2">
@@ -414,6 +399,24 @@ const isSidebarOpen = ref(false)
 
       </div>
     </div>
+
+    <!-- ── OVERLAY LOADING ── -->
+    <transition name="overlay-fade">
+      <div
+        v-if="isSaving"
+        class="fixed inset-0 z-[9999] bg-emerald-950/60 backdrop-blur-xl flex flex-col items-center justify-center gap-5 text-white"
+      >
+        <div class="relative w-24 h-24">
+          <div class="absolute inset-0 border-8 border-emerald-200/10 rounded-full"></div>
+          <div class="absolute inset-0 border-8 border-yellow-400 rounded-full border-t-transparent animate-spin"></div>
+          <div class="absolute inset-0 flex items-center justify-center text-4xl animate-pulse">🕌</div>
+        </div>
+        <div class="text-center">
+          <p class="text-2xl font-black tracking-widest uppercase bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 to-yellow-500 px-4">Sedang Menyimpan...</p>
+          <p class="text-emerald-100/70 text-sm mt-2 font-medium">Mohon tidak menutup halaman ini.</p>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
