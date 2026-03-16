@@ -218,9 +218,6 @@ const isSidebarOpen = ref(false)
       </div>
     </transition>
 
-      </div>
-    </transition>
-
     <!-- Mobile Header -->
     <div class="md:hidden bg-gradient-to-r from-emerald-800 to-emerald-900 text-white p-4 flex justify-between items-center shadow-md relative z-50">
       <div class="flex items-center gap-2">
