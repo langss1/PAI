@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useMainStore } from '../../stores/mainStore'
 
 const router = useRouter()
+const route = useRoute()
 const store = useMainStore()
 
 const materialForm = ref({
@@ -45,8 +46,43 @@ const doLogout = () => {
   router.push('/admin/login')
 }
 
-onMounted(() => {
-  const route = useRoute()
+// ── Image Upload logic ──
+const handleImageUpload = async (e) => {
+  const file = e.target.files[0]
+  if (!file) return
+
+  try {
+    const img = new Image()
+    const reader = new FileReader()
+    
+    reader.onload = (event) => {
+      img.src = event.target.result
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const MAX_WIDTH = 800
+        const scaleSize = MAX_WIDTH / img.width
+        canvas.width = MAX_WIDTH
+        canvas.height = img.height * scaleSize
+        
+        const ctx = canvas.getContext('2d')
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        
+        // Simpan sebagai string base64 yang dikompres
+        materialForm.value.imageUrl = canvas.toDataURL('image/jpeg', 0.7)
+      }
+    }
+    reader.readAsDataURL(file)
+  } catch (err) {
+    showPopup('Gagal memproses gambar: ' + err.message, 'error')
+  }
+}
+
+onMounted(async () => {
+  // Pastikan data materi sudah ter-load (penting jika page di-refresh langsung di URL edit)
+  if (store.materials.length === 0) {
+    await store.fetchMaterials()
+  }
+  
   if(route.params.id) {
     isEditMode.value = true
     const editMat = store.materials.find(m => String(m.id) === String(route.params.id))
@@ -74,13 +110,16 @@ onMounted(() => {
       }
     }
   }
+  
+  // Pastikan kategori juga tersedia
+  if (store.categories.length === 0) {
+    await store.fetchCategories()
+  }
 })
 
 const submitData = async () => {
   if (!materialForm.value.title) return showPopup('Peringatan: Judul materi pembelajaran wajib diisi!', 'error')
   if (materialForm.value.title.length < 5) return showPopup('Judul minimal harus berisi 5 huruf atau lebih.', 'error')
-  
-  const route = useRoute()
   
   if(isEditMode.value) {
     const success = await store.updateMaterial(route.params.id, {
@@ -93,7 +132,7 @@ const submitData = async () => {
     })
     if(success) {
       showPopup('Alhamdulillah! Materi PAI berhasil di-update.', 'success')
-      setTimeout(() => router.push('/admin/dashboard'), 3000)
+      setTimeout(() => router.push('/admin/dashboard'), 2000)
     }
   } else {
     const success = await store.addMaterial({
@@ -106,7 +145,7 @@ const submitData = async () => {
     })
     if(success) {
       showPopup('Alhamdulillah! Materi PAI dan susunan Kuis berhasil diterbitkan.', 'success')
-      setTimeout(() => router.push('/admin/dashboard'), 3000)
+      setTimeout(() => router.push('/admin/dashboard'), 2000)
     }
   }
 }
@@ -154,33 +193,14 @@ const isSidebarOpen = ref(false)
             v-if="confirmLogout"
             class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 flex flex-col items-center text-center gap-4"
           >
-            <!-- Ikon -->
-            <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center text-3xl">
-              🔒
-            </div>
-
-            <!-- Teks -->
+            <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center text-3xl">🔒</div>
             <div>
               <h3 class="text-lg font-black text-slate-800 mb-1">Keluar dari Portal?</h3>
-              <p class="text-sm text-slate-500 leading-relaxed">
-                Sesi guru akan diakhiri. Anda perlu login kembali untuk mengakses dashboard.
-              </p>
+              <p class="text-sm text-slate-500 leading-relaxed">Sesi guru akan diakhiri. Anda perlu login kembali untuk mengakses dashboard.</p>
             </div>
-
-            <!-- Tombol -->
             <div class="flex gap-3 w-full mt-1">
-              <button
-                @click="confirmLogout = false"
-                class="flex-1 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all active:scale-95"
-              >
-                Batal
-              </button>
-              <button
-                @click="doLogout"
-                class="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-500/30 transition-all active:scale-95"
-              >
-                Ya, Keluar
-              </button>
+              <button @click="confirmLogout = false" class="flex-1 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all active:scale-95">Batal</button>
+              <button @click="doLogout" class="flex-1 py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-sm shadow-lg shadow-red-500/30 transition-all active:scale-95">Ya, Keluar</button>
             </div>
           </div>
         </transition>
@@ -241,7 +261,7 @@ const isSidebarOpen = ref(false)
       </ul>
 
       <div class="mt-12 pt-6 border-t border-emerald-700/50 relative z-10">
-        <button @click="logout" class="w-full flex items-center justify-center gap-3 text-red-100 hover:text-white bg-red-900/40 hover:bg-red-600 p-4 rounded-xl transition-all text-left font-bold shadow hover:shadow-lg hover:-translate-y-1 border border-red-800/30">
+        <button @click="logout" class="w-full flex items-center justify-center gap-3 text-red-100 hover:text-white bg-red-900/40 hover:bg-red-600 p-4 rounded-xl transition-all font-bold shadow hover:shadow-lg hover:-translate-y-1 border border-red-800/30">
           <span class="text-xl">🔒</span> Log Keluar
         </button>
       </div>
@@ -277,21 +297,7 @@ const isSidebarOpen = ref(false)
             </div>
             <div class="group">
               <label class="block font-bold text-emerald-800 text-sm mb-2">Upload Gambar Representasi</label>
-              <input type="file" accept="image/*" @change="async (e) => { 
-                const file = e.target.files[0]; 
-                if(!file) return;
-                const img = new Image();
-                img.src = URL.createObjectURL(file);
-                await new Promise(r => img.onload = r);
-                const canvas = document.createElement('canvas');
-                const MAX_WIDTH = 800;
-                const scaleSize = MAX_WIDTH / img.width;
-                canvas.width = MAX_WIDTH;
-                canvas.height = img.height * scaleSize;
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                materialForm.imageUrl = canvas.toDataURL('image/jpeg', 0.6);
-              }" class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-lg p-3 outline-none transition-colors text-slate-800 font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
+              <input type="file" accept="image/*" @change="handleImageUpload" class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-lg p-3 outline-none transition-colors text-slate-800 font-medium file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 cursor-pointer">
               <p class="text-xs text-slate-500 mt-2" v-if="materialForm.imageUrl">Gambar siap dipublish ✓</p>
             </div>
           </div>

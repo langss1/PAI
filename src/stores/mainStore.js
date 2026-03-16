@@ -80,10 +80,10 @@ export const useMainStore = defineStore('main', {
       if(!materialPayload.title) return;
       this.loading = true
       
-      const { questions, title, content, videoUrl, imageUrl } = materialPayload
+      const { questions, title, content, videoUrl, imageUrl, category } = materialPayload
 
       try {
-        const payloadToInsert = { title, content, video_url: videoUrl }
+        const payloadToInsert = { title, content, video_url: videoUrl, category }
         if(imageUrl) payloadToInsert.image_url = imageUrl
 
         const { data: newMat, error } = await supabase.from('materials').insert([payloadToInsert]).select()
@@ -124,12 +124,11 @@ export const useMainStore = defineStore('main', {
       if(!id || !materialPayload.title) return;
       this.loading = true
       
-      const { questions, title, content, videoUrl, imageUrl } = materialPayload
+      const { questions, title, content, videoUrl, imageUrl, category } = materialPayload
 
       try {
-        const payloadToUpdate = { title, content, video_url: videoUrl, updated_at: new Date() }
+        const payloadToUpdate = { title, content, video_url: videoUrl, category, updated_at: new Date() }
         if(imageUrl && !imageUrl.startsWith('blob:')) payloadToUpdate.image_url = imageUrl
-
         const { error } = await supabase.from('materials').update(payloadToUpdate).eq('id', id)
         if (error) throw error
 

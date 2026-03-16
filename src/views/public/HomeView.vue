@@ -81,9 +81,9 @@ const filteredMaterials = computed(() => {
             </div>
           </div>
           
-          <div class="p-5 pt-4 flex flex-col flex-grow">
-            <div v-if="mat.category" class="mb-1">
-              <span class="bg-emerald-100 text-emerald-800 text-[11px] font-black px-2 py-0.5 rounded-lg">#{{ mat.category }}</span>
+          <div class="p-5 pt-2 flex flex-col flex-grow">
+            <div v-if="mat.category" class="mb-0">
+              <span class="bg-emerald-100 text-emerald-800 text-[13px] font-black px-2.5 py-0.5 rounded-lg">#{{ mat.category }}</span>
             </div>
             <div class="mb-2">
                <h3 class="text-xl font-bold text-slate-800 line-clamp-2 leading-snug">{{ mat.title }}</h3>
