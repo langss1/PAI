@@ -142,13 +142,14 @@ const filteredStudents = computed(() =>
 
     <!-- Sidebar -->
     <div
-      class="fixed inset-y-0 left-0 transform md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-40 w-72 bg-gradient-to-br from-emerald-800 via-emerald-900 to-yellow-600 text-white p-8 flex flex-col shadow-2xl overflow-y-auto"
+      class="fixed inset-y-0 left-0 transform md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-40 w-72 bg-gradient-to-br from-emerald-800 via-emerald-900 to-yellow-600 text-white flex flex-col shadow-2xl overflow-hidden"
       :class="{'translate-x-0': isSidebarOpen, '-translate-x-full': !isSidebarOpen}"
     >
       <div class="absolute -top-[20%] -right-[10%] w-[350px] h-[350px] bg-emerald-600 rounded-full blur-[80px] opacity-40"></div>
       <div class="absolute -bottom-[10%] -left-[10%] w-[300px] h-[300px] bg-yellow-500 rounded-full blur-[100px] opacity-30"></div>
 
-      <div class="hidden md:flex items-center gap-3 mb-10 relative z-10">
+      <!-- Sidebar Header -->
+      <div class="px-8 pt-8 pb-4 hidden md:flex items-center gap-3 relative z-10 flex-shrink-0">
         <div class="w-14 h-14 rounded-full overflow-hidden bg-white border-2 border-emerald-100 shadow-lg flex items-center justify-center flex-shrink-0">
           <img :src="logoDataUrl" alt="PAI HUB Logo" class="w-full h-full object-contain p-1" />
         </div>
@@ -158,35 +159,39 @@ const filteredStudents = computed(() =>
         </div>
       </div>
 
-      <ul class="space-y-4 relative z-10 text-[15px] font-bold tracking-wide flex-grow mt-6 md:mt-0">
-        <li>
-          <router-link to="/admin/dashboard" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
-            <span class="text-xl">📖</span> Dashboard
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/admin/materi/tambah" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
-            <span class="text-xl">✍️</span> Tambah/Edit Materi
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/admin/kuis" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
-            <span class="text-xl">🎓</span> Kelola Kuis Global
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/admin/kehadiran" @click="isSidebarOpen = false" class="flex items-center gap-4 text-white bg-emerald-700/60 p-4 rounded-xl shadow-inner border border-emerald-500/30 backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-            <span class="text-xl">📊</span> Data Nilai Siswa
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/admin/kategori" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
-            <span class="text-xl">🏷️</span> Kelola Kategori
-          </router-link>
-        </li>
-      </ul>
+      <!-- Navigation Links - Scrollable Area -->
+      <div class="flex-grow overflow-y-auto px-8 py-6 relative z-10">
+        <ul class="space-y-4 text-[15px] font-bold tracking-wide">
+          <li>
+            <router-link to="/admin/dashboard" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
+              <span class="text-xl">📖</span> Dashboard
+            </router-link>
+          </li>
+          <li>
+            <router-link to="/admin/materi/tambah" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
+              <span class="text-xl">✍️</span> Tambah/Edit Materi
+            </router-link>
+          </li>
+          <li>
+            <router-link to="/admin/kuis" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
+              <span class="text-xl">🎓</span> Kelola Kuis Global
+            </router-link>
+          </li>
+          <li>
+            <router-link to="/admin/kehadiran" @click="isSidebarOpen = false" class="flex items-center gap-4 text-white bg-emerald-700/60 p-4 rounded-xl shadow-inner border border-emerald-500/30 backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+              <span class="text-xl">📊</span> Data Nilai Siswa
+            </router-link>
+          </li>
+          <li>
+            <router-link to="/admin/kategori" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
+              <span class="text-xl">🏷️</span> Kelola Kategori
+            </router-link>
+          </li>
+        </ul>
+      </div>
 
-      <div class="mt-12 pt-6 border-t border-emerald-700/50 relative z-10">
+      <!-- Logout Button - Fixed at Bottom -->
+      <div class="px-8 py-6 border-t border-emerald-700/50 relative z-10 flex-shrink-0">
         <button @click="logout" class="w-full flex items-center justify-center gap-3 text-red-100 hover:text-white bg-red-900/40 hover:bg-red-600 p-4 rounded-xl transition-all font-bold shadow hover:shadow-lg hover:-translate-y-1 border border-red-800/30">
           <span class="text-xl">🔒</span> Log Out
         </button>
@@ -206,21 +211,6 @@ const filteredStudents = computed(() =>
         <p class="text-emerald-700 font-medium text-base md:text-lg max-w-xl">Lacak kehadiran siswa beserta hasil nilai evaluasi pembelajaran secara Real-Time.</p>
       </div>
 
-      <!-- Filter -->
-      <div class="mb-6">
-        <div class="bg-white px-4 py-3 rounded-xl border border-slate-200 flex items-center justify-between gap-4">
-          <div class="flex-grow">
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Filter Berdasar Kurikulum</label>
-            <select v-model="filterMaterial" class="w-full bg-transparent border-none focus:ring-0 text-emerald-900 font-bold outline-none p-0 cursor-pointer text-sm">
-              <option value="">Semua Materi</option>
-              <option v-for="mat in materialsList" :key="mat.id" :value="mat.title">{{ mat.title }}</option>
-            </select>
-          </div>
-          <div class="w-8 h-8 bg-emerald-100 rounded-full flex items-center justify-center font-bold text-emerald-800 text-sm flex-shrink-0">
-            {{ filteredStudents.length }}
-          </div>
-        </div>
-      </div>
 
       <!-- TABEL: md ke atas -->
       <div class="hidden md:block bg-white rounded-2xl border border-slate-200 mb-10 overflow-hidden animate-slideUp">

@@ -86,20 +86,39 @@ const addQuestion = () => {
   }, 100)
 }
 
-const removeQuestion = (index) => {
-  if (questions.value.length <= 1) return showPopup('Minimal harus ada 1 soal.', 'error')
-  questions.value.splice(index, 1)
-}
-
 const isSidebarOpen = ref(false)
 const confirmLogout = ref(false)
+const confirmDeleteQuestion = ref({ show: false, index: null })
+
 const logout = () => {
   isSidebarOpen.value = false
   confirmLogout.value = true
 }
+
 const doLogout = () => {
   localStorage.removeItem('admin_auth')
   router.push('/admin/login')
+}
+
+const triggerDeleteQuestion = (index) => {
+  confirmDeleteQuestion.value = { show: true, index }
+}
+
+const doDeleteQuestion = () => {
+  if (confirmDeleteQuestion.value.index !== null) {
+    questions.value.splice(confirmDeleteQuestion.value.index, 1)
+  }
+  confirmDeleteQuestion.value.show = false
+  if (questions.value.length === 0) {
+    questions.value.push({
+      text: '',
+      optionA: '',
+      optionB: '',
+      optionC: '',
+      optionD: '',
+      correctAnswer: 'A'
+    })
+  }
 }
 </script>
 
@@ -133,6 +152,23 @@ const doLogout = () => {
       </div>
     </transition>
 
+    <!-- Question Delete Confirmation Modal -->
+    <transition name="fade">
+      <div v-if="confirmDeleteQuestion.show" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[2000] flex items-center justify-center p-6">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-8 flex flex-col items-center text-center gap-5 animate-scaleUp">
+          <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center text-3xl mb-2">🗑️</div>
+          <div>
+            <h3 class="text-xl font-black text-slate-800 mb-1">Hapus Soal?</h3>
+            <p class="text-slate-500 text-sm leading-relaxed">Soal ini akan dihapus dari daftar. Tindakan ini tidak dapat dibatalkan.</p>
+          </div>
+          <div class="flex gap-3 w-full mt-1">
+            <button @click="confirmDeleteQuestion.show = false" class="flex-1 py-3 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-all active:scale-95">Batal</button>
+            <button @click="doDeleteQuestion" class="flex-1 py-3 rounded-xl bg-red-600 text-white font-bold text-sm shadow-lg shadow-red-500/30 hover:bg-red-700 transition-all active:scale-95">Ya, Hapus</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
     <!-- Mobile Header -->
     <div class="md:hidden bg-gradient-to-r from-emerald-800 to-emerald-900 text-white p-4 flex justify-between items-center shadow-md relative z-50">
       <div class="flex items-center gap-2">
@@ -148,11 +184,12 @@ const doLogout = () => {
     </div>
 
     <!-- Sidebar -->
-    <div class="fixed inset-y-0 left-0 transform md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-40 w-72 bg-gradient-to-br from-emerald-800 via-emerald-900 to-yellow-600 text-white p-8 flex flex-col shadow-2xl overflow-y-auto" :class="{'translate-x-0': isSidebarOpen, '-translate-x-full': !isSidebarOpen}">
+    <div class="fixed inset-y-0 left-0 transform md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-40 w-72 bg-gradient-to-br from-emerald-800 via-emerald-900 to-yellow-600 text-white flex flex-col shadow-2xl overflow-hidden" :class="{'translate-x-0': isSidebarOpen, '-translate-x-full': !isSidebarOpen}">
       <div class="absolute -top-[20%] -right-[10%] w-[350px] h-[350px] bg-emerald-600 rounded-full blur-[80px] opacity-40"></div>
       <div class="absolute -bottom-[10%] -left-[10%] w-[300px] h-[300px] bg-yellow-500 rounded-full blur-[100px] opacity-30"></div>
 
-      <div class="hidden md:flex items-center gap-3 mb-10 relative z-10">
+      <!-- Sidebar Header -->
+      <div class="px-8 pt-8 pb-4 hidden md:flex items-center gap-3 relative z-10 flex-shrink-0">
         <div class="w-14 h-14 rounded-full overflow-hidden bg-white border-2 border-emerald-100 shadow-lg flex items-center justify-center flex-shrink-0">
           <img :src="logoDataUrl" alt="PAI HUB Logo" class="w-full h-full object-contain p-1" />
         </div>
@@ -161,15 +198,23 @@ const doLogout = () => {
           <p class="text-xs text-emerald-100 font-medium">PAI HUB</p>
         </div>
       </div>
-      <ul class="space-y-4 relative z-10 text-[15px] font-bold tracking-wide flex-grow mt-6 md:mt-0">
-        <li><router-link to="/admin/dashboard" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white p-4 rounded-xl hover:bg-emerald-700/30 transition-all">📖 Dashboard</router-link></li>
-        <li><router-link to="/admin/materi/tambah" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white p-4 rounded-xl hover:bg-emerald-700/30 transition-all">✍️ Tambah Materi</router-link></li>
-        <li><router-link to="/admin/kuis" @click="isSidebarOpen = false" class="flex items-center gap-4 text-white bg-emerald-700/60 p-4 rounded-xl shadow border border-emerald-500/30 backdrop-blur-sm transition-all">🎓 Kuis Global</router-link></li>
-        <li><router-link to="/admin/kehadiran" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white p-4 rounded-xl hover:bg-emerald-700/30 transition-all">📊 Nilai Siswa</router-link></li>
-        <li><router-link to="/admin/kategori" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white p-4 rounded-xl hover:bg-emerald-700/30 transition-all">🏷️ Kategori</router-link></li>
-      </ul>
-      <div class="mt-12 pt-6 border-t border-emerald-700/50 relative z-10">
-        <button @click="logout" class="w-full flex items-center justify-center gap-3 text-red-100 bg-red-900/40 p-4 rounded-xl font-bold hover:bg-red-600 hover:text-white transition-all">🔒 Log Out</button>
+
+      <!-- Navigation Links - Scrollable Area -->
+      <div class="flex-grow overflow-y-auto px-8 py-6 relative z-10">
+        <ul class="space-y-4 text-[15px] font-bold tracking-wide">
+          <li><router-link to="/admin/dashboard" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white p-4 rounded-xl hover:bg-emerald-700/30 transition-all">📖 Dashboard</router-link></li>
+          <li><router-link to="/admin/materi/tambah" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white p-4 rounded-xl hover:bg-emerald-700/30 transition-all">✍️ Tambah Materi</router-link></li>
+          <li><router-link to="/admin/kuis" @click="isSidebarOpen = false" class="flex items-center gap-4 text-white bg-emerald-700/60 p-4 rounded-xl shadow border border-emerald-500/30 backdrop-blur-sm transition-all">🎓 Kuis Global</router-link></li>
+          <li><router-link to="/admin/kehadiran" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white p-4 rounded-xl hover:bg-emerald-700/30 transition-all">📊 Nilai Siswa</router-link></li>
+          <li><router-link to="/admin/kategori" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white p-4 rounded-xl hover:bg-emerald-700/30 transition-all">🏷️ Kategori</router-link></li>
+        </ul>
+      </div>
+
+      <!-- Logout Button - Fixed at Bottom -->
+      <div class="px-8 py-6 border-t border-emerald-700/50 relative z-10 flex-shrink-0">
+        <button @click="logout" class="w-full flex items-center justify-center gap-3 text-red-100 bg-red-900/40 p-4 rounded-xl font-bold hover:bg-red-600 hover:text-white transition-all shadow-lg border border-red-800/30">
+          <span class="text-xl">🔒</span> Log Out
+        </button>
       </div>
     </div>
 
@@ -190,8 +235,8 @@ const doLogout = () => {
               <div class="w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center font-black text-sm">{{ idx + 1 }}</div>
               <h3 class="font-bold text-emerald-900">Pertanyaan Ke-{{ idx + 1 }}</h3>
             </div>
-            <button @click="removeQuestion(idx)" class="text-red-400 hover:text-red-600 font-bold text-sm flex items-center gap-1 transition-colors">
-              <span>🗑️</span> Hapus
+            <button @click="triggerDeleteQuestion(idx)" class="w-12 h-12 flex items-center justify-center bg-red-50 hover:bg-red-100 text-red-500 rounded-full transition-all hover:scale-110 shadow-sm border border-red-100" title="Hapus Soal">
+              <span class="text-2xl">🗑️</span>
             </button>
           </div>
 
