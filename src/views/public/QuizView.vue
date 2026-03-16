@@ -21,6 +21,9 @@ onMounted(async () => {
 })
 
 const startQuiz = () => {
+  if (questions.value.length === 0) {
+    return alert('Maaf, saat ini belum ada soal ujian yang tersedia. Hubungi Gurumu.')
+  }
   if (!studentName.value || studentName.value.length < 3) {
     return alert('Harap isi nama lengkapmu terlebih dahulu (minimal 3 huruf).')
   }
@@ -80,12 +83,20 @@ const handleSubmit = async () => {
         <div v-if="quizStep === 'intro'" class="text-center animate-slideUp">
            <div class="text-6xl md:text-8xl mb-6">📖</div>
            <h1 class="text-3xl md:text-5xl font-black text-emerald-950 mb-4 leading-tight">Ujian Akhir PAI Online</h1>
-           <p class="text-emerald-800 font-medium mb-10 max-w-md mx-auto opacity-80">Kerjakan {{ questions.length }} soal evaluasi untuk mengukur pemahaman materi Pendidikan Agama Islam yang telah dipelajari.</p>
            
-           <div class="bg-white p-6 md:p-10 rounded-3xl shadow-xl border border-emerald-100 max-w-sm mx-auto">
-             <label class="block text-left text-xs font-black text-emerald-800 uppercase tracking-widest mb-3">Tulis Nama Lengkapmu:</label>
-             <input v-model="studentName" type="text" placeholder="Contoh: Ahmad Fauzi" class="w-full p-4 border-2 border-slate-200 rounded-2xl focus:border-emerald-500 outline-none text-center font-bold text-lg text-emerald-900 mb-6 transition-all shadow-inner">
-             <button @click="startQuiz" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black text-lg shadow-lg shadow-emerald-900/20 active:scale-95 transition-all">Mulai Ujian Sekarang 🚀</button>
+           <div v-if="questions.length > 0">
+             <p class="text-emerald-800 font-medium mb-10 max-w-md mx-auto opacity-80">Kerjakan {{ questions.length }} soal evaluasi untuk mengukur pemahaman materi Pendidikan Agama Islam yang telah dipelajari.</p>
+             
+             <div class="bg-white p-6 md:p-10 rounded-3xl shadow-xl border border-emerald-100 max-w-sm mx-auto">
+               <label class="block text-left text-xs font-black text-emerald-800 uppercase tracking-widest mb-3">Tulis Nama Lengkapmu:</label>
+               <input v-model="studentName" type="text" placeholder="Contoh: Ahmad Fauzi" class="w-full p-4 border-2 border-slate-200 rounded-2xl focus:border-emerald-500 outline-none text-center font-bold text-lg text-emerald-900 mb-6 transition-all shadow-inner">
+               <button @click="startQuiz" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black text-lg shadow-lg shadow-emerald-900/20 active:scale-95 transition-all">Mulai Ujian Sekarang 🚀</button>
+             </div>
+           </div>
+           
+           <div v-else class="bg-white p-10 rounded-3xl shadow-xl border border-emerald-100 max-w-md mx-auto">
+             <p class="text-slate-500 font-bold mb-6">Soal ujian belum tersedia untuk saat ini.</p>
+             <router-link to="/" class="text-emerald-600 font-black border-b-2 border-emerald-600 pb-1">Kembali ke Beranda</router-link>
            </div>
         </div>
 

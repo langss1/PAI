@@ -106,13 +106,16 @@ onMounted(async () => {
 
     <!-- Popup Notifikasi Global -->
     <transition name="fade">
-      <div v-if="popup.show" class="fixed top-10 left-1/2 -translate-x-1/2 z-[200] animate-fadeInDown">
+      <div v-if="popup.show" class="fixed inset-0 z-[200] flex items-center justify-center pointer-events-none p-4">
         <div
-          class="px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border-2 backdrop-blur-md"
-          :class="popup.type === 'success' ? 'bg-emerald-500/90 border-emerald-400 text-white' : (popup.type === 'warning' ? 'bg-yellow-500/90 border-yellow-400 text-white' : 'bg-red-500/90 border-red-400 text-white')"
+          class="px-8 py-6 rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col items-center text-center gap-3 border-2 backdrop-blur-xl animate-scaleUp pointer-events-auto max-w-sm w-full"
+          :class="popup.type === 'success' ? 'bg-emerald-900/90 border-emerald-400 text-white' : (popup.type === 'warning' ? 'bg-yellow-600/90 border-yellow-400 text-white' : 'bg-red-900/90 border-red-500 text-white')"
         >
-          <span class="text-2xl">{{ popup.type === 'success' ? '✨' : '⚠️' }}</span>
-          <p class="font-bold tracking-wide">{{ popup.message }}</p>
+          <span class="text-4xl">{{ popup.type === 'success' ? '✨' : '⚠️' }}</span>
+          <div>
+            <p class="font-black text-lg tracking-wide mb-1">{{ popup.type === 'success' ? 'Berhasil' : 'Peringatan' }}</p>
+            <p class="font-medium text-sm opacity-90">{{ popup.message }}</p>
+          </div>
         </div>
       </div>
     </transition>

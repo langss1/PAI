@@ -94,6 +94,10 @@ const submitData = async () => {
   if (materialForm.value.title.length < 5) return showPopup('Judul minimal harus berisi 5 huruf atau lebih.', 'error')
   
   isSaving.value = true
+  
+  // Beri waktu sedikit agar DOM bereaksi menunjukkan loading
+  await new Promise(r => setTimeout(r, 200))
+
   try {
     if(isEditMode.value) {
       const success = await store.updateMaterial(route.params.id, {
@@ -140,24 +144,26 @@ const isSidebarOpen = ref(false)
     <transition name="popup">
       <div
         v-if="popup.show && !isSaving"
-        class="fixed top-5 left-1/2 -translate-x-1/2 z-[999] w-[90vw] max-w-sm px-5 py-4 rounded-2xl shadow-2xl flex items-start gap-3 border"
-        :class="popup.type === 'success'
-          ? 'bg-emerald-900 border-emerald-600/50 text-white shadow-emerald-900/40'
-          : 'bg-red-900 border-red-600/50 text-white shadow-red-900/40'"
+        class="fixed inset-0 z-[999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm"
       >
-        <div
-          class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 text-lg"
-          :class="popup.type === 'success' ? 'bg-emerald-700' : 'bg-red-700'"
+        <div 
+          class="bg-white rounded-3xl shadow-2xl w-full max-w-sm p-8 flex flex-col items-center text-center gap-5 animate-slideUp"
+          :class="popup.type === 'success' ? 'border-t-8 border-emerald-600' : 'border-t-8 border-red-600'"
         >
-          {{ popup.type === 'success' ? '✅' : '⚠️' }}
+          <div 
+            class="w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-2"
+            :class="popup.type === 'success' ? 'bg-emerald-100' : 'bg-red-100'"
+          >
+            {{ popup.type === 'success' ? '✅' : '⚠️' }}
+          </div>
+          <div>
+            <h3 class="text-2xl font-black text-slate-800 mb-1">
+              {{ popup.type === 'success' ? 'Berhasil' : 'Peringatan' }}
+            </h3>
+            <p class="text-slate-500 font-medium leading-relaxed">{{ popup.message }}</p>
+          </div>
+          <button @click="popup.show = false" class="w-full py-4 rounded-2xl bg-slate-100 text-slate-600 font-bold hover:bg-slate-200 transition-all active:scale-95">Mengerti</button>
         </div>
-        <div class="flex-1 min-w-0">
-          <p class="font-bold text-sm leading-snug">
-            {{ popup.type === 'success' ? 'Berhasil' : 'Peringatan' }}
-          </p>
-          <p class="text-xs mt-0.5 opacity-80 leading-relaxed">{{ popup.message }}</p>
-        </div>
-        <button @click="popup.show = false" class="text-white/50 hover:text-white text-lg leading-none flex-shrink-0 mt-0.5 transition">✕</button>
       </div>
     </transition>
 
@@ -313,11 +319,14 @@ const isSidebarOpen = ref(false)
         <button
           @click="submitData"
           :disabled="isSaving"
-          class="w-full flex justify-center py-4 px-4 rounded-xl shadow border border-emerald-600 bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 text-yellow-300 font-poppins font-bold text-lg md:text-xl transition-all duration-300 transform hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(4,120,87,0.6)] mt-8 tracking-wide disabled:from-slate-400 disabled:to-slate-500 disabled:border-slate-300 disabled:text-slate-100 disabled:shadow-none disabled:transform-none disabled:cursor-not-allowed"
+          class="w-full flex justify-center items-center py-4 px-4 rounded-xl shadow border border-emerald-600 font-poppins font-bold text-lg md:text-xl transition-all duration-300 transform mt-8 tracking-wide disabled:shadow-none disabled:transform-none disabled:cursor-wait"
+          :class="isSaving 
+            ? 'bg-slate-400 text-slate-100' 
+            : 'bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 text-yellow-300 hover:-translate-y-1 hover:shadow-[0_10px_20px_-10px_rgba(4,120,87,0.6)]'"
         >
           <span v-if="!isSaving">Simpan Materi PAI</span>
           <span v-else class="flex items-center gap-2">
-            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <svg class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>

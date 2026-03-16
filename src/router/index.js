@@ -21,6 +21,8 @@ const routes = [
     component: HomeView
   },
   {
+    path: '/materi/:id',
+    name: 'MaterialDetail',
     component: MaterialDetail,
     props: true
   },
@@ -62,6 +64,8 @@ const routes = [
     meta: { requiresAuth: true }
   },
   {
+    path: '/admin/kategori',
+    name: 'ManageCategory',
     component: CategoryView,
     meta: { requiresAuth: true }
   },

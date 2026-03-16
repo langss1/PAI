@@ -121,6 +121,9 @@ export const useMainStore = defineStore('main', {
     // 5. Hapus Materi
     async deleteMaterial(id) {
       try {
+        // Hapus data nilai/kehadiran terkait materi ini dulu (Integritas Data)
+        await supabase.from('student_results').delete().eq('material_id', id)
+
         const { error } = await supabase.from('materials').delete().eq('id', id)
         if (error) throw error
         this.materials = this.materials.filter(m => m.id !== id)

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useMainStore } from '../../stores/mainStore'
 
 const store = useMainStore()
@@ -36,6 +36,11 @@ const selectCategory = (name) => {
 const isActiveFilter = computed(() =>
   activeFilter.value !== 'Semua' || sortOrder.value !== 'terbaru'
 )
+
+onMounted(() => {
+  store.fetchMaterials()
+  store.fetchCategories()
+})
 </script>
 
 <template>
@@ -77,102 +82,102 @@ const isActiveFilter = computed(() =>
       </section>
 
       <!-- Search and Filter -->
-      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
-      <!-- Judul -->
-      <div class="text-center mb-10 animate-[fadeInDown_0.6s_ease-out]">
-        <h2 class="text-3xl md:text-5xl font-extrabold text-slate-800 drop-shadow-sm mb-4">Mari Mulai Belajar!</h2>
-        <p class="text-slate-500 text-base md:text-xl font-medium max-w-2xl mx-auto">Jelajahi materi kurikulum interaktif dan uji kemampuanmu lewat evaluasi kuis.</p>
-      </div>
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
+        <!-- Judul -->
+        <div class="text-center mb-10 animate-[fadeInDown_0.6s_ease-out]">
+          <h2 class="text-3xl md:text-5xl font-extrabold text-slate-800 drop-shadow-sm mb-4">Mari Mulai Belajar!</h2>
+          <p class="text-slate-500 text-base md:text-xl font-medium max-w-2xl mx-auto">Jelajahi materi kurikulum interaktif dan uji kemampuanmu lewat evaluasi kuis.</p>
+        </div>
 
-      <!-- ── FILTER & SORT BAR ── -->
-      <div class="flex items-center justify-between gap-3 mb-8 animate-[fadeIn_0.8s_ease-out]">
+        <!-- FILTER & SORT BAR -->
+        <div class="flex items-center justify-between gap-3 mb-8 animate-[fadeIn_0.8s_ease-out]">
+          <!-- Info hasil filter -->
+          <p class="text-sm font-medium text-slate-500">
+            <span class="font-bold text-emerald-700">{{ filteredMaterials.length }}</span> materi
+            <span v-if="activeFilter !== 'Semua'"> &bull; <span class="text-emerald-600 font-bold">#{{ activeFilter }}</span></span>
+          </p>
 
-        <!-- Info hasil filter -->
-        <p class="text-sm font-medium text-slate-500">
-          <span class="font-bold text-emerald-700">{{ filteredMaterials.length }}</span> materi
-          <span v-if="activeFilter !== 'Semua'"> · <span class="text-emerald-600 font-bold">#{{ activeFilter }}</span></span>
-        </p>
-
-        <div class="flex items-center gap-2">
-          <!-- Sort Dropdown -->
-          <select
-            v-model="sortOrder"
-            @click.stop
-            class="bg-white border-2 border-slate-200 text-slate-700 font-bold text-xs sm:text-sm px-2 sm:px-3 py-2 rounded-xl outline-none focus:border-emerald-400 cursor-pointer transition"
-          >
-            <option value="terbaru">⬇ Terbaru</option>
-            <option value="terlama">⬆ Terlama</option>
-            <option value="az">🔤 A → Z</option>
-            <option value="za">🔤 Z → A</option>
-          </select>
-
-          <!-- Tombol Filter (Popover) -->
-          <div class="relative" @click.stop>
-            <button
-              @click="isFilterOpen = !isFilterOpen"
-              class="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition-all"
-              :class="isActiveFilter
-                ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
-                : 'bg-white border-slate-200 text-slate-700 hover:border-emerald-400 hover:text-emerald-700'"
+          <div class="flex items-center gap-2">
+            <!-- Sort Dropdown -->
+            <select
+              v-model="sortOrder"
+              @click.stop
+              class="bg-white border-2 border-slate-200 text-slate-700 font-bold text-xs sm:text-sm px-2 sm:px-3 py-2 rounded-xl outline-none focus:border-emerald-400 cursor-pointer transition"
             >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M7 12h10M11 20h2"/>
-              </svg>
-              Filter
-              <span
-                v-if="activeFilter !== 'Semua'"
-                class="w-2 h-2 rounded-full"
-                :class="isActiveFilter ? 'bg-yellow-300' : 'bg-emerald-500'"
-              ></span>
-            </button>
+              <option value="terbaru">⬇ Terbaru</option>
+              <option value="terlama">⬆ Terlama</option>
+              <option value="az">🔤 A → Z</option>
+              <option value="za">🔤 Z → A</option>
+            </select>
 
-            <!-- Popover Panel -->
-            <transition name="popover">
-              <div
-                v-if="isFilterOpen"
-                class="absolute right-0 mt-2 w-56 bg-white rounded-2xl border border-slate-200 shadow-2xl shadow-slate-200/80 z-50 overflow-hidden"
+            <!-- Tombol Filter (Popover) -->
+            <div class="relative" @click.stop>
+              <button
+                @click="isFilterOpen = !isFilterOpen"
+                class="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl font-bold text-xs sm:text-sm border-2 transition-all"
+                :class="isActiveFilter
+                  ? 'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-500/20'
+                  : 'bg-white border-slate-200 text-slate-700 hover:border-emerald-400 hover:text-emerald-700'"
               >
-                <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-                  <span class="text-xs font-black text-slate-500 uppercase tracking-wider">Kategori</span>
-                  <button
-                    v-if="activeFilter !== 'Semua'"
-                    @click="activeFilter = 'Semua'"
-                    class="text-xs font-bold text-red-400 hover:text-red-600 transition"
-                  >Reset</button>
-                </div>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 4h18M7 12h10M11 20h2" />
+                </svg>
+                Filter
+                <span
+                  v-if="activeFilter !== 'Semua'"
+                  class="w-2 h-2 rounded-full"
+                  :class="isActiveFilter ? 'bg-yellow-300' : 'bg-emerald-500'"
+                ></span>
+              </button>
 
-                <div class="py-2 max-h-72 overflow-y-auto">
-                  <button
-                    @click="selectCategory('Semua')"
-                    class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-bold transition-colors text-left"
-                    :class="activeFilter === 'Semua' ? 'bg-emerald-50 text-emerald-700' : 'text-slate-700 hover:bg-slate-50'"
-                  >
-                    <span>Semua Materi</span>
-                    <span v-if="activeFilter === 'Semua'" class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                  </button>
+              <!-- Popover Panel -->
+              <transition name="popover">
+                <div
+                  v-if="isFilterOpen"
+                  class="absolute right-0 mt-2 w-56 bg-white rounded-2xl border border-slate-200 shadow-2xl shadow-slate-200/80 z-50 overflow-hidden"
+                >
+                  <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
+                    <span class="text-xs font-black text-slate-500 uppercase tracking-wider">Kategori</span>
+                    <button
+                      v-if="activeFilter !== 'Semua'"
+                      @click="activeFilter = 'Semua'"
+                      class="text-xs font-bold text-red-400 hover:text-red-600 transition"
+                    >Reset</button>
+                  </div>
 
-                  <button
-                    v-for="cat in categories"
-                    :key="cat.id"
-                    @click="selectCategory(cat.name)"
-                    class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-bold transition-colors text-left"
-                    :class="activeFilter === cat.name ? 'bg-emerald-50 text-emerald-700' : 'text-slate-700 hover:bg-slate-50'"
-                  >
-                    <span class="flex items-center gap-2">
-                      <span class="text-slate-400 font-normal">#</span>{{ cat.name }}
-                    </span>
-                    <span v-if="activeFilter === cat.name" class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
-                  </button>
+                  <div class="py-2 max-h-72 overflow-y-auto">
+                    <button
+                      @click="selectCategory('Semua')"
+                      class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-bold transition-colors text-left"
+                      :class="activeFilter === 'Semua' ? 'bg-emerald-50 text-emerald-700' : 'text-slate-700 hover:bg-slate-50'"
+                    >
+                      <span>Semua Materi</span>
+                      <span v-if="activeFilter === 'Semua'" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    </button>
 
-                  <div v-if="categories.length === 0" class="px-4 py-4 text-center text-slate-400 text-xs font-medium">
-                    Belum ada kategori tersedia.
+                    <button
+                      v-for="cat in categories"
+                      :key="cat.id"
+                      @click="selectCategory(cat.name)"
+                      class="w-full flex items-center justify-between px-4 py-2.5 text-sm font-bold transition-colors text-left"
+                      :class="activeFilter === cat.name ? 'bg-emerald-50 text-emerald-700' : 'text-slate-700 hover:bg-slate-50'"
+                    >
+                      <span class="flex items-center gap-2">
+                        <span class="text-slate-400 font-normal">#</span>{{ cat.name }}
+                      </span>
+                      <span v-if="activeFilter === cat.name" class="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                    </button>
+
+                    <div v-if="categories.length === 0" class="px-4 py-4 text-center text-slate-400 text-xs font-medium">
+                      Belum ada kategori tersedia.
+                    </div>
                   </div>
                 </div>
-              </div>
-            </transition>
+              </transition>
+            </div>
           </div>
         </div>
-      </section>
+      </div>
 
       <!-- Kosong -->
       <div v-if="filteredMaterials.length === 0" class="text-center bg-white p-12 rounded-3xl shadow-sm border border-slate-100 mt-10">

@@ -59,6 +59,26 @@ const handleSave = async () => {
   }
 }
 
+const addQuestion = () => {
+  questions.value.push({
+    text: '',
+    optionA: '',
+    optionB: '',
+    optionC: '',
+    optionD: '',
+    correctAnswer: 'A'
+  })
+  // Scroll to bottom
+  setTimeout(() => {
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' })
+  }, 100)
+}
+
+const removeQuestion = (index) => {
+  if (questions.value.length <= 1) return showPopup('Minimal harus ada 1 soal.', 'error')
+  questions.value.splice(index, 1)
+}
+
 const isSidebarOpen = ref(false)
 const confirmLogout = ref(false)
 const logout = () => {
@@ -136,9 +156,14 @@ const doLogout = () => {
         <div v-for="(q, idx) in questions" :key="idx" class="mb-12 p-6 md:p-8 bg-slate-50 border border-slate-200 rounded-2xl relative overflow-hidden group hover:border-emerald-300 transition-all">
           <div class="absolute top-0 right-0 p-4 opacity-5 text-4xl font-black group-hover:opacity-10 transition-opacity">#{{ idx + 1 }}</div>
           
-          <div class="flex items-center gap-3 mb-6">
-            <div class="w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center font-black text-sm">{{ idx + 1 }}</div>
-            <h3 class="font-bold text-emerald-900">Pertanyaan Ke-{{ idx + 1 }}</h3>
+          <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-emerald-600 text-white rounded-full flex items-center justify-center font-black text-sm">{{ idx + 1 }}</div>
+              <h3 class="font-bold text-emerald-900">Pertanyaan Ke-{{ idx + 1 }}</h3>
+            </div>
+            <button @click="removeQuestion(idx)" class="text-red-400 hover:text-red-600 font-bold text-sm flex items-center gap-1 transition-colors">
+              <span>🗑️</span> Hapus
+            </button>
           </div>
 
           <textarea v-model="q.text" placeholder="Tuliskan soal pilihan ganda di sini..." class="w-full bg-white border border-slate-200 focus:border-emerald-500 rounded-xl p-4 min-h-[100px] outline-none transition-all mb-6 text-slate-800 font-medium"></textarea>
@@ -158,13 +183,19 @@ const doLogout = () => {
           </div>
         </div>
 
-        <button @click="handleSave" :disabled="isSaving" class="w-full py-5 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 text-yellow-300 font-bold text-xl shadow-xl shadow-emerald-900/20 flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50">
-          <span v-if="!isSaving">Simpan Seluruh Soal Kuis</span>
-          <span v-else class="flex items-center gap-3">
-             <svg class="animate-spin h-6 w-6 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-             Sedang Memproses...
-          </span>
-        </button>
+        <div class="flex flex-col md:flex-row gap-4">
+          <button @click="addQuestion" class="flex-1 py-5 rounded-2xl bg-white border-2 border-emerald-600 text-emerald-700 font-bold text-xl hover:bg-emerald-50 transition-all active:scale-95 flex items-center justify-center gap-3">
+            <span>➕</span> Tambah Butir Soal
+          </button>
+          
+          <button @click="handleSave" :disabled="isSaving" class="flex-[2] py-5 rounded-2xl bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 text-yellow-300 font-bold text-xl shadow-xl shadow-emerald-900/20 flex items-center justify-center gap-3 transition-all active:scale-95 disabled:opacity-50">
+            <span v-if="!isSaving">Simpan Seluruh Soal Kuis</span>
+            <span v-else class="flex items-center gap-3">
+               <svg class="animate-spin h-6 w-6 text-white" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+               Sedang Memproses...
+            </span>
+          </button>
+        </div>
       </div>
     </div>
 

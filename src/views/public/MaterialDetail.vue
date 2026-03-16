@@ -15,6 +15,7 @@ const materialTitle = computed(() => material.value?.title || 'Memuat Materi...'
 const materialContent = computed(() => material.value?.content || '')
 const materialImage = computed(() => material.value?.image_url || '')
 const materialVideo = computed(() => material.value?.video_url || '')
+const materialCategory = computed(() => material.value?.category || '')
 
 const youtubeEmbedUrl = computed(() => {
   if (!materialVideo.value) return null
@@ -90,7 +91,10 @@ const youtubeEmbedUrl = computed(() => {
             
             <!-- Title di atas gambar -->
             <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8">
-              <span class="inline-block px-3 py-1 bg-yellow-400 text-yellow-900 rounded-full font-black text-xs uppercase tracking-wider mb-2 shadow">
+              <div v-if="materialCategory" class="inline-block px-3 py-1 bg-white text-emerald-800 rounded-lg font-black text-xs sm:text-sm mb-3 shadow-md border border-emerald-100 flex items-center gap-1 w-fit">
+                <span class="text-emerald-500 opacity-60">#</span>{{ materialCategory }}
+              </div>
+              <span class="inline-block px-3 py-1 bg-yellow-400 text-yellow-900 rounded-full font-black text-[10px] uppercase tracking-wider mb-2 shadow">
                 Bahan Ajar Online
               </span>
               <h1 class="text-xl sm:text-2xl md:text-4xl font-black text-white drop-shadow leading-snug">
@@ -149,8 +153,7 @@ const youtubeEmbedUrl = computed(() => {
           </div>
         </div>
 
-      <!-- Bagian Kuis dihapus dan dipindahkan ke QuizView.vue -->
-      </transition>
+
     </main>
   </div>
 </template>
