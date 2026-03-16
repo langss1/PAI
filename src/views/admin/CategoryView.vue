@@ -14,6 +14,18 @@ const selectedMaterialIds = ref([])
 // State untuk logout confirmation
 const confirmLogout = ref(false)
 
+// State untuk popup notifikasi & konfirmasi
+const popup = ref({ show: false, message: '', type: 'success' })
+const showPopup = (message, type = 'success') => {
+  popup.value = { show: true, message, type }
+  setTimeout(() => { popup.value.show = false }, 3000)
+}
+
+const confirmDelete = ref({ show: false, id: null })
+const askDeleteCategory = (id) => {
+  confirmDelete.value = { show: true, id }
+}
+
 const categories = computed(() => store.categories)
 const materials = computed(() => store.materials)
 
@@ -21,7 +33,6 @@ const selectedCategory = computed(() => {
   return categories.value.find(c => c.id === selectedCategoryId.value)
 })
 
-// Saat kategori dipilih, centang materi yang sudah masuk kategori tersebut
 const handleCategorySelect = () => {
   if (!selectedCategory.value) {
     selectedMaterialIds.value = []
@@ -38,28 +49,29 @@ const handleAddCategory = async () => {
   const success = await store.addCategory(cleanName)
   if (success) {
     newCategoryName.value = ''
-    alert('Kategori berhasil ditambahkan!')
+    showPopup('Kategori berhasil ditambahkan!', 'success')
   }
 }
 
-const handleDeleteCategory = async (id) => {
-  if (confirm('Hapus kategori ini? Materi yang menggunakannya akan kehilangan tagar ini.')) {
-    await store.deleteCategory(id)
-    if (selectedCategoryId.value === id) {
-      selectedCategoryId.value = ''
-      selectedMaterialIds.value = []
-    }
+const doDeleteCategory = async () => {
+  const id = confirmDelete.value.id
+  if (!id) return
+  
+  await store.deleteCategory(id)
+  if (selectedCategoryId.value === id) {
+    selectedCategoryId.value = ''
+    selectedMaterialIds.value = []
   }
+  confirmDelete.value.show = false
+  showPopup('Kategori telah dihapus.', 'success')
 }
 
 const handleSaveAssignment = async () => {
   if (!selectedCategory.value) {
-    alert('Pilih kategori terlebih dahulu!')
+    showPopup('Pilih kategori terlebih dahulu!', 'warning')
     return
   }
 
-  // Materi yang dicentang -> Set kategori ini
-  // Materi yang TIDAK dicentang TAPI sebelumnya punya kategori ini -> Set null
   const materialsToUpdate = selectedMaterialIds.value
   const materialsToClear = materials.value
     .filter(m => m.category === selectedCategory.value.name && !selectedMaterialIds.value.includes(m.id))
@@ -70,7 +82,7 @@ const handleSaveAssignment = async () => {
     if (materialsToClear.length > 0) {
       await store.removeCategoryFromMaterials(materialsToClear)
     }
-    alert('Pembaruan kategori berhasil disimpan!')
+    showPopup('Pembaruan kategori berhasil disimpan!', 'success')
   }
 }
 
@@ -92,6 +104,36 @@ onMounted(async () => {
 <template>
   <div class="min-h-screen bg-slate-50 flex flex-col md:flex-row shadow-inner text-slate-800 w-full relative">
     
+    <!-- Popup Notifikasi Global -->
+    <transition name="fade">
+      <div v-if="popup.show" class="fixed top-10 left-1/2 -translate-x-1/2 z-[200] animate-fadeInDown">
+        <div 
+          class="px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border-2 backdrop-blur-md"
+          :class="popup.type === 'success' ? 'bg-emerald-500/90 border-emerald-400 text-white' : (popup.type === 'warning' ? 'bg-yellow-500/90 border-yellow-400 text-white' : 'bg-red-500/90 border-red-400 text-white')"
+        >
+          <span class="text-2xl">{{ popup.type === 'success' ? '✨' : '⚠️' }}</span>
+          <p class="font-bold tracking-wide">{{ popup.message }}</p>
+        </div>
+      </div>
+    </transition>
+
+    <!-- Modal Konfirmasi Hapus Kategori -->
+    <transition name="fade">
+      <div v-if="confirmDelete.show" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[150] flex items-center justify-center p-6">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-sm:w-full max-w-sm p-8 flex flex-col items-center text-center gap-5 animate-scaleUp">
+          <div class="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center text-4xl">🗑️</div>
+          <div>
+            <h3 class="text-2xl font-black text-slate-800 mb-2">Hapus Kategori?</h3>
+            <p class="text-slate-500 text-sm leading-relaxed">Tagar ini akan dihapus dari semua materi yang menggunakannya. Tindakan ini tidak dapat dibatalkan.</p>
+          </div>
+          <div class="flex gap-3 w-full mt-2">
+            <button @click="confirmDelete.show = false" class="flex-1 py-4 rounded-2xl border-2 border-slate-100 text-slate-400 font-bold hover:bg-slate-50 transition-all">Batal</button>
+            <button @click="doDeleteCategory" class="flex-1 py-4 rounded-2xl bg-red-600 text-white font-bold shadow-lg shadow-red-500/30 hover:bg-red-700 transition-all">Ya, Hapus</button>
+          </div>
+        </div>
+      </div>
+    </transition>
+
     <!-- Logout Overlay -->
     <transition name="fade">
       <div v-if="confirmLogout" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6">
@@ -204,7 +246,7 @@ onMounted(async () => {
               class="group bg-slate-50 border border-slate-200 rounded-xl p-4 flex justify-between items-center hover:border-emerald-300 hover:bg-emerald-50 transition-all font-bold text-slate-700"
             >
               <span class="truncate">#{{ cat.name }}</span>
-              <button @click="handleDeleteCategory(cat.id)" class="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+              <button @click="askDeleteCategory(cat.id)" class="text-slate-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
               </button>
             </div>
@@ -302,4 +344,12 @@ onMounted(async () => {
 }
 .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
+
+@keyframes fadeInDown {
+  0% { opacity: 0; transform: translateY(-20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeInDown {
+  animation: fadeInDown 0.5s ease-out;
+}
 </style>

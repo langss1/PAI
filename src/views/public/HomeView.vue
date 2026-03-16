@@ -76,13 +76,15 @@ const filteredMaterials = computed(() => {
               <span class="text-6xl opacity-50">📖</span>
             </div>
             <div class="absolute inset-0 bg-gradient-to-t from-slate-900/60 to-transparent"></div>
-            <div class="absolute bottom-4 left-4 flex flex-col gap-2">
-              <span class="w-fit bg-yellow-400 text-yellow-900 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">Buku Materi</span>
-              <span v-if="mat.category" class="w-fit bg-emerald-500 text-white text-[10px] font-black px-3 py-1 rounded-full shadow-sm ring-2 ring-emerald-400/50">#{{ mat.category }}</span>
+            <div class="absolute bottom-4 left-4">
+              <span class="bg-yellow-400 text-yellow-900 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">Buku Materi</span>
             </div>
           </div>
           
           <div class="p-6 flex flex-col flex-grow">
+            <div v-if="mat.category" class="mb-3">
+              <span class="bg-emerald-100 text-emerald-800 text-[11px] font-black px-3 py-1 rounded-lg">#{{ mat.category }}</span>
+            </div>
             <div class="mb-2">
                <h3 class="text-xl font-bold text-slate-800 line-clamp-2 leading-snug">{{ mat.title }}</h3>
             </div>
