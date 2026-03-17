@@ -182,14 +182,13 @@ const isActiveFilter = computed(() =>
           </div>
 
           <!-- Konten Kartu -->
-          <div class="p-3 sm:p-5 sm:pt-3 flex flex-col flex-grow">
-            <h3 class="text-sm sm:text-xl font-bold text-slate-800 mb-1 sm:mb-2 line-clamp-2 leading-snug">{{ mat.title }}</h3>
-            <!-- Deskripsi disembunyikan di mobile agar kartu tetap compact -->
-            <p class="hidden sm:block text-slate-500 text-sm mb-6 line-clamp-3 leading-relaxed flex-grow">{{ mat.content || '...' }}</p>
-
+          <div class="p-3 pt-3 flex flex-col" style="height: 100px;">
+            <h3 class="text-sm font-bold text-slate-800 mb-0 line-clamp-2 leading-snug flex-shrink-0">
+              {{ mat.title }}
+            </h3>
             <router-link
               :to="`/materi/${mat.id}`"
-              class="block w-full text-center bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white font-bold py-2 sm:py-3 rounded-lg sm:rounded-xl transition duration-300 shadow-sm border border-emerald-100 text-xs sm:text-sm mt-auto"
+              class="block w-full text-center bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white font-bold py-2 rounded-lg transition duration-300 shadow-sm border border-emerald-100 text-xs mt-auto flex-shrink-0"
             >
               Mulai Belajar
             </router-link>
