@@ -89,7 +89,7 @@ const handleSubmit = async () => {
              
              <div class="bg-white p-6 md:p-10 rounded-3xl shadow-xl border border-emerald-100 max-w-sm mx-auto">
                <label class="block text-left text-xs font-black text-emerald-800 uppercase tracking-widest mb-3">Tulis Nama Lengkapmu:</label>
-               <input v-model="studentName" type="text" placeholder="Contoh: Ahmad Fauzi" class="w-full p-4 border-2 border-slate-200 rounded-2xl focus:border-emerald-500 outline-none text-center font-bold text-lg text-emerald-900 mb-6 transition-all shadow-inner">
+               <input v-model="studentName" type="text" placeholder="Contoh: Faqih" class="w-full p-4 border-2 border-slate-200 rounded-2xl focus:border-emerald-500 outline-none text-center font-bold text-lg text-emerald-900 mb-6 transition-all shadow-inner">
                <button @click="startQuiz" class="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 text-white font-black text-lg shadow-lg shadow-emerald-900/20 active:scale-95 transition-all">Mulai Ujian Sekarang 🚀</button>
              </div>
            </div>
