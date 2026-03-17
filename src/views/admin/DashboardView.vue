@@ -130,13 +130,14 @@ const doDelete = async () => {
 
     <!-- Sidebar -->
     <div
-      class="fixed inset-y-0 left-0 transform md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-40 w-72 bg-gradient-to-br from-emerald-800 via-emerald-900 to-yellow-600 animate-gradient animate-fadeInLeft text-white p-8 flex flex-col shadow-2xl overflow-y-auto"
+      class="fixed inset-y-0 left-0 transform md:relative md:translate-x-0 transition-transform duration-300 ease-in-out z-40 w-72 bg-gradient-to-br from-emerald-800 via-emerald-900 to-yellow-600 animate-gradient animate-fadeInLeft text-white flex flex-col shadow-2xl overflow-hidden"
       :class="{'translate-x-0': isSidebarOpen, '-translate-x-full': !isSidebarOpen}"
     >
       <div class="absolute -top-[20%] -right-[10%] w-[350px] h-[350px] bg-emerald-600 rounded-full blur-[80px] opacity-40 animate-blob1"></div>
       <div class="absolute -bottom-[10%] -left-[10%] w-[300px] h-[300px] bg-yellow-500 rounded-full blur-[100px] opacity-30 animate-blob2"></div>
 
-      <div class="hidden md:flex items-center gap-3 mb-10 relative z-10">
+      <!-- Sidebar Header -->
+      <div class="px-8 pt-8 pb-4 hidden md:flex items-center gap-3 relative z-10 flex-shrink-0">
         <div class="w-14 h-14 rounded-full overflow-hidden bg-white border-2 border-emerald-100 shadow-lg flex items-center justify-center flex-shrink-0">
           <img :src="logoDataUrl" alt="PAI HUB Logo" class="w-full h-full object-contain p-1" />
         </div>
@@ -146,32 +147,41 @@ const doDelete = async () => {
         </div>
       </div>
 
-      <ul class="space-y-4 relative z-10 text-[15px] font-bold tracking-wide flex-grow mt-6 md:mt-0">
-        <li>
-          <router-link to="/admin/dashboard" @click="isSidebarOpen = false" class="flex items-center gap-4 text-white bg-emerald-700/60 p-4 rounded-xl shadow-inner border border-emerald-500/30 backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-            <span class="text-xl">📖</span> Dashboard
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/admin/materi/tambah" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
-            <span class="text-xl">✍️</span> Tambah/Edit Materi
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/admin/kehadiran" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
-            <span class="text-xl">📊</span> Data Nilai Siswa
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/admin/kategori" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
-            <span class="text-xl">🏷️</span> Kelola Kategori
-          </router-link>
-        </li>
-      </ul>
+      <!-- Navigation Links - Scrollable Area -->
+      <div class="flex-grow overflow-y-auto px-8 py-6 relative z-10">
+        <ul class="space-y-4 text-[15px] font-bold tracking-wide">
+          <li>
+            <router-link to="/admin/dashboard" @click="isSidebarOpen = false" class="flex items-center gap-4 text-white bg-emerald-700/60 p-4 rounded-xl shadow-inner border border-emerald-500/30 backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-lg">
+              <span class="text-xl">📖</span> Dashboard
+            </router-link>
+          </li>
+          <li>
+            <router-link to="/admin/materi/tambah" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
+              <span class="text-xl">✍️</span> Tambah/Edit Materi
+            </router-link>
+          </li>
+          <li>
+            <router-link to="/admin/kuis" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
+              <span class="text-xl">🎓</span> Kelola Kuis Global
+            </router-link>
+          </li>
+          <li>
+            <router-link to="/admin/kehadiran" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
+              <span class="text-xl">📊</span> Data Nilai Siswa
+            </router-link>
+          </li>
+          <li>
+            <router-link to="/admin/kategori" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
+              <span class="text-xl">🏷️</span> Kelola Kategori
+            </router-link>
+          </li>
+        </ul>
+      </div>
 
-      <div class="mt-12 pt-6 border-t border-emerald-700/50 relative z-10">
+      <!-- Logout Button - Fixed at Bottom -->
+      <div class="px-8 py-6 border-t border-emerald-700/50 relative z-10 flex-shrink-0">
         <button @click="logout" class="w-full flex items-center justify-center gap-3 text-red-100 hover:text-white bg-red-900/40 hover:bg-red-600 p-4 rounded-xl transition-all font-bold shadow hover:shadow-lg hover:-translate-y-1 border border-red-800/30">
-          <span class="text-xl">🔒</span> Log Keluar
+          <span class="text-xl">🔒</span> Log Out
         </button>
       </div>
     </div>

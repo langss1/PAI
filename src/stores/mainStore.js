@@ -6,6 +6,7 @@ export const useMainStore = defineStore('main', {
     materials: [],
     studentResults: [],
     categories: [],
+    globalQuestions: [],
     loading: false
   }),
   
@@ -22,11 +23,6 @@ export const useMainStore = defineStore('main', {
 
         if (data) {
           this.materials = data
-          for (let m of this.materials) {
-            // Ambil kuis untuk prepopulate edit
-            const { data: qData } = await supabase.from('quiz_questions').select('*').eq('material_id', m.id)
-            if (qData) m.quiz_questions = qData
-          }
         } else if (error) {
           console.error('Info Tim: Belum nyambung ke Supabase. Pesan:', error.message)
         }
@@ -66,8 +62,8 @@ export const useMainStore = defineStore('main', {
             id: result.id,
             name: result.student_name,
             score: result.score,
-            materialTitle: result.materials?.title || 'Unknown Material',
-            status: result.score > 0 ? 'Hadir via Kuis' : 'Hadir Manual'
+            materialTitle: result.materials?.title || 'Kuis Utama Global',
+            status: result.score > 0 ? 'Selesai Kuis' : 'Hadir Manual'
           }))
         }
       } catch (e) {
@@ -89,27 +85,7 @@ export const useMainStore = defineStore('main', {
         const { data: newMat, error } = await supabase.from('materials').insert([payloadToInsert]).select()
         if (error) throw error
 
-        if (newMat && newMat.length > 0) {
-          const materialId = newMat[0].id
-          if (questions && questions.length > 0) {
-            const formattedQuestions = questions
-              .filter(q => q.text.trim() !== '')
-              .map(q => ({
-                material_id: materialId,
-                question_text: q.text,
-                option_a: q.optionA,
-                option_b: q.optionB,
-                option_c: q.optionC,
-                option_d: q.optionD,
-                correct_option: q.correctAnswer
-              }))
-            
-            if(formattedQuestions.length > 0) {
-              await supabase.from('quiz_questions').insert(formattedQuestions)
-            }
-          }
-          await this.fetchMaterials() // Refresh State
-        }
+        await this.fetchMaterials() 
         return true
       } catch (e) {
         alert('Gagal simpan ke Supabase! Pastikan tabel "materials" sudah memiliki kolom "image_url". Error: ' + e.message)
@@ -132,26 +108,6 @@ export const useMainStore = defineStore('main', {
         const { error } = await supabase.from('materials').update(payloadToUpdate).eq('id', id)
         if (error) throw error
 
-        // Hapus soal lama lalu ganti dengan yang baru (metode termudah untuk bulk update kuis)
-        await supabase.from('quiz_questions').delete().eq('material_id', id)
-
-        if (questions && questions.length > 0) {
-          const formattedQuestions = questions
-            .filter(q => q.text.trim() !== '')
-            .map(q => ({
-              material_id: id,
-              question_text: q.text,
-              option_a: q.optionA,
-              option_b: q.optionB,
-              option_c: q.optionC,
-              option_d: q.optionD,
-              correct_option: q.correctAnswer
-            }))
-          
-          if(formattedQuestions.length > 0) {
-            await supabase.from('quiz_questions').insert(formattedQuestions)
-          }
-        }
         await this.fetchMaterials()
         return true
       } catch (e) {
@@ -165,6 +121,9 @@ export const useMainStore = defineStore('main', {
     // 5. Hapus Materi
     async deleteMaterial(id) {
       try {
+        // Hapus data nilai/kehadiran terkait materi ini dulu (Integritas Data)
+        await supabase.from('student_results').delete().eq('material_id', id)
+
         const { error } = await supabase.from('materials').delete().eq('id', id)
         if (error) throw error
         this.materials = this.materials.filter(m => m.id !== id)
@@ -278,6 +237,48 @@ export const useMainStore = defineStore('main', {
         await this.fetchMaterials()
       } catch (e) {
         console.error(e)
+      }
+    },
+
+    // 11. Fetch Kuis Global
+    async fetchGlobalQuestions() {
+      try {
+        const { data, error } = await supabase.from('global_quiz_questions').select('*').order('created_at', { ascending: true })
+        if (data) this.globalQuestions = data
+      } catch (e) {
+        console.error('Gagal fetch kuis global:', e)
+      }
+    },
+
+    // 12. Update Bulk Kuis Global
+    async saveGlobalQuestions(questions) {
+      this.loading = true
+      try {
+        // Hapus semua lalu insert ulang untuk simplisitas bulk update
+        await supabase.from('global_quiz_questions').delete().neq('id', '00000000-0000-0000-0000-000000000000') // Trick delete all
+
+        const formatted = questions
+          .filter(q => q.text && q.text.trim() !== '')
+          .map(q => ({
+            question_text: q.text,
+            option_a: q.optionA,
+            option_b: q.optionB,
+            option_c: q.optionC,
+            option_d: q.optionD,
+            correct_option: q.correctAnswer
+          }))
+        
+        if (formatted.length > 0) {
+          const { error } = await supabase.from('global_quiz_questions').insert(formatted)
+          if (error) throw error
+        }
+        await this.fetchGlobalQuestions()
+        return true
+      } catch (e) {
+        alert('Gagal simpan kuis: ' + e.message)
+        return false
+      } finally {
+        this.loading = false
       }
     }
   }
