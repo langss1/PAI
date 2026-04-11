@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/public/HomeView.vue'
 import MaterialDetail from '../views/public/MaterialDetail.vue'
+import WelcomeScreen from '../views/public/WelcomeScreen.vue'
 
 // Admin Views
 import LoginView from '../views/admin/LoginView.vue'
@@ -17,6 +18,11 @@ const routes = [
   // --- PUBLIC ROUTES (Siswa) ---
   {
     path: '/',
+    name: 'Welcome',
+    component: WelcomeScreen
+  },
+  {
+    path: '/home',
     name: 'Home',
     component: HomeView
   },
@@ -85,20 +91,17 @@ const router = createRouter({
 // Navigation Guard untuk Security Halaman Admin
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('admin_auth') === 'secure_token_abc123'
-  
-  // Jika rute butuh login (semua halaman admin kecuali login)
+
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!isAuthenticated) {
-      // Belum login? Tendang ke halaman login
       next({ name: 'AdminLogin' })
     } else {
-      next() // Sudah login, silakan masuk
+      next()
     }
   } else if (to.name === 'AdminLogin' && isAuthenticated) {
-    // Kalau sudah login tapi maksa buka halaman login, tendang ke dashboard
     next({ name: 'AdminDashboard' })
   } else {
-    next() // Rute publik, biarkan saja
+    next()
   }
 })
 

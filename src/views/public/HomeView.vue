@@ -70,7 +70,7 @@ onMounted(() => {
         <!-- Judul -->
         <div class="text-center mb-10 animate-[fadeInDown_0.6s_ease-out]">
           <h2 class="text-3xl md:text-5xl font-extrabold text-slate-800 drop-shadow-sm mb-4">Mari Mulai Belajar!</h2>
-          <p class="text-slate-500 text-base md:text-xl font-medium max-w-2xl mx-auto">Jelajahi Materi Kebudayaan Islam Di Indonesia.</p>
+          <p class="text-slate-500 text-base md:text-xl font-medium max-w-2xl mx-auto">Jelajahi Materi Sejarah Kebudayaan Islam Di Indonesia.</p>
         </div>
 
         <!-- FILTER & SORT BAR -->
