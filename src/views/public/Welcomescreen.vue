@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { setWelcomeDone } from '../../router/index.js'
 
 const router = useRouter()
 const visible = ref(false)
@@ -11,8 +12,10 @@ onMounted(() => {
 })
 
 const goHome = () => {
+  if (leaving.value) return
   leaving.value = true
-  setTimeout(() => { router.push('/home') }, 600)
+  setWelcomeDone()
+  setTimeout(() => { router.push({ name: 'Home' }) }, 600)
 }
 </script>
 
@@ -22,15 +25,12 @@ const goHome = () => {
     :class="{ visible, leaving }"
     @click="goHome"
   >
-    <!-- Background pattern -->
     <div class="bg-pattern"></div>
 
-    <!-- Decorative circles -->
     <div class="deco deco-1"></div>
     <div class="deco deco-2"></div>
     <div class="deco deco-3"></div>
 
-    <!-- Ornamental motif top -->
     <div class="ornament top-ornament">
       <svg viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M100 4 L110 20 L100 36 L90 20 Z" fill="rgba(255,255,255,0.15)" />
@@ -43,9 +43,7 @@ const goHome = () => {
       </svg>
     </div>
 
-    <!-- Content -->
     <div class="content">
-      <!-- Logo badge -->
       <div class="logo-wrap">
         <div class="logo-badge">
           <span class="logo-pai">PAI</span>
@@ -53,20 +51,16 @@ const goHome = () => {
         <span class="logo-hub">HUB</span>
       </div>
 
-      <!-- Bismillah text -->
       <p class="bismillah">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ</p>
 
-      <!-- Divider line -->
       <div class="divider">
         <span class="divider-dot"></span>
         <span class="divider-line"></span>
         <span class="divider-dot"></span>
       </div>
 
-      <!-- Main title -->
       <h1 class="main-title">Sejarah Kebudayaan Islam</h1>
 
-      <!-- Subtitle -->
       <p class="subtitle">
         Peran Tokoh Ulama Dalam Penyebaran Islam di Indonesia
       </p>
@@ -74,14 +68,12 @@ const goHome = () => {
         Metode Dakwah Islam Oleh Wali Songo di Tanah Jawa
       </p>
 
-      <!-- Divider line -->
       <div class="divider" style="margin-top: 2rem;">
         <span class="divider-dot"></span>
         <span class="divider-line"></span>
         <span class="divider-dot"></span>
       </div>
 
-      <!-- CTA Button -->
       <button class="cta-btn" @click.stop="goHome">
         <span>Mulai Belajar</span>
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -92,7 +84,6 @@ const goHome = () => {
       <p class="tap-hint">Ketuk di mana saja untuk melanjutkan</p>
     </div>
 
-    <!-- Ornamental motif bottom -->
     <div class="ornament bottom-ornament">
       <svg viewBox="0 0 200 40" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M100 4 L110 20 L100 36 L90 20 Z" fill="rgba(255,255,255,0.15)" />
@@ -108,7 +99,6 @@ const goHome = () => {
 </template>
 
 <style scoped>
-/* ─── Base ─────────────────────────────────────────── */
 .welcome-screen {
   position: fixed;
   inset: 0;
@@ -134,7 +124,6 @@ const goHome = () => {
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-/* ─── Background pattern ────────────────────────────── */
 .bg-pattern {
   position: absolute;
   inset: 0;
@@ -144,23 +133,14 @@ const goHome = () => {
   pointer-events: none;
 }
 
-/* ─── Decorative circles ────────────────────────────── */
 .deco {
   position: absolute;
   border-radius: 50%;
   border: 1px solid rgba(255,255,255,0.08);
   pointer-events: none;
 }
-.deco-1 {
-  width: 500px; height: 500px;
-  top: -200px; right: -200px;
-  border-color: rgba(255,255,255,0.06);
-}
-.deco-2 {
-  width: 300px; height: 300px;
-  bottom: -100px; left: -100px;
-  border-color: rgba(255,255,255,0.06);
-}
+.deco-1 { width: 500px; height: 500px; top: -200px; right: -200px; border-color: rgba(255,255,255,0.06); }
+.deco-2 { width: 300px; height: 300px; bottom: -100px; left: -100px; border-color: rgba(255,255,255,0.06); }
 .deco-3 {
   width: 200px; height: 200px;
   top: 50%; left: 50%;
@@ -173,12 +153,10 @@ const goHome = () => {
   50% { transform: translate(-50%, -50%) scale(1.15); opacity: 0.15; }
 }
 
-/* ─── Ornaments ─────────────────────────────────────── */
 .ornament { position: absolute; width: 200px; pointer-events: none; }
 .top-ornament { top: 2rem; left: 50%; transform: translateX(-50%); }
 .bottom-ornament { bottom: 2rem; left: 50%; transform: translateX(-50%); }
 
-/* ─── Content ───────────────────────────────────────── */
 .content {
   position: relative;
   z-index: 1;
@@ -191,7 +169,6 @@ const goHome = () => {
   width: 100%;
 }
 
-/* Logo */
 .logo-wrap {
   display: flex;
   align-items: center;
@@ -218,7 +195,6 @@ const goHome = () => {
   letter-spacing: 0.1em;
 }
 
-/* Bismillah */
 .bismillah {
   font-family: 'Times New Roman', serif;
   font-size: clamp(1.4rem, 5vw, 2rem);
@@ -228,7 +204,6 @@ const goHome = () => {
   animation: fadeDown 0.8s ease 0.35s both;
 }
 
-/* Divider */
 .divider {
   display: flex;
   align-items: center;
@@ -250,7 +225,6 @@ const goHome = () => {
   flex-shrink: 0;
 }
 
-/* Main title */
 .main-title {
   font-size: clamp(1.8rem, 6vw, 2.8rem);
   font-weight: 900;
@@ -262,7 +236,6 @@ const goHome = () => {
   animation: fadeUp 0.8s ease 0.5s both;
 }
 
-/* Subtitle */
 .subtitle {
   font-size: clamp(0.85rem, 2.5vw, 1rem);
   color: rgba(255,255,255,0.8);
@@ -281,7 +254,6 @@ const goHome = () => {
   animation: fadeUp 0.8s ease 0.65s both;
 }
 
-/* CTA Button */
 .cta-btn {
   display: inline-flex;
   align-items: center;
@@ -305,11 +277,8 @@ const goHome = () => {
   transform: translateY(-2px);
   box-shadow: 0 8px 28px rgba(251,191,36,0.45);
 }
-.cta-btn:active {
-  transform: scale(0.97);
-}
+.cta-btn:active { transform: scale(0.97); }
 
-/* Hint */
 .tap-hint {
   margin-top: 1rem;
   font-size: 0.72rem;
@@ -318,7 +287,6 @@ const goHome = () => {
   animation: fadeIn 1s ease 1.2s both;
 }
 
-/* ─── Animations ───────────────────────────────────── */
 @keyframes fadeDown {
   from { opacity: 0; transform: translateY(-16px); }
   to   { opacity: 1; transform: translateY(0); }
