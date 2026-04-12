@@ -1,9 +1,8 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
-import { setWelcomeDone } from '../../router/index.js'
 
-const router = useRouter()
+const emit = defineEmits(['done'])
+
 const visible = ref(false)
 const leaving = ref(false)
 
@@ -14,8 +13,7 @@ onMounted(() => {
 const goHome = () => {
   if (leaving.value) return
   leaving.value = true
-  setWelcomeDone()
-  setTimeout(() => { router.push({ name: 'Home' }) }, 600)
+  setTimeout(() => { emit('done') }, 600)
 }
 </script>
 
