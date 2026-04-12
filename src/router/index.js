@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/public/HomeView.vue'
 import MaterialDetail from '../views/public/MaterialDetail.vue'
+import WelcomeScreen from '../views/public/WelcomeScreen.vue'
 
 // Admin Views
 import LoginView from '../views/admin/LoginView.vue'
@@ -13,10 +14,22 @@ import GlobalQuizView from '../views/admin/GlobalQuizView.vue'
 // Public Quiz View
 import QuizView from '../views/public/QuizView.vue'
 
+// Flag in-memory: reset setiap kali halaman dibuka/refresh
+// Tidak pakai localStorage/sessionStorage, jadi welcome SELALU muncul saat buka app
+let welcomeDone = false
+
+export const setWelcomeDone = () => {
+  welcomeDone = true
+}
+
 const routes = [
-  // --- PUBLIC ROUTES (Siswa) ---
   {
     path: '/',
+    name: 'Welcome',
+    component: WelcomeScreen
+  },
+  {
+    path: '/home',
     name: 'Home',
     component: HomeView
   },
@@ -32,7 +45,7 @@ const routes = [
     component: QuizView
   },
 
-  // --- ADMIN ROUTES (Guru) ---
+  // --- ADMIN ROUTES ---
   {
     path: '/admin/login',
     name: 'AdminLogin',
@@ -82,21 +95,32 @@ const router = createRouter({
   routes
 })
 
-// Navigation Guard untuk Security Halaman Admin
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('admin_auth') === 'secure_token_abc123'
 
+  // Sudah lewati welcome → kalau paksa balik ke '/' redirect ke home
+  if (to.name === 'Welcome' && welcomeDone) {
+    return next({ name: 'Home' })
+  }
+
+  // Belum lihat welcome → paksa ke welcome dulu
+  if (to.name === 'Home' && !welcomeDone) {
+    return next({ name: 'Welcome' })
+  }
+
+  // Security admin
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!isAuthenticated) {
-      next({ name: 'AdminLogin' })
-    } else {
-      next()
+      return next({ name: 'AdminLogin' })
     }
-  } else if (to.name === 'AdminLogin' && isAuthenticated) {
-    next({ name: 'AdminDashboard' })
-  } else {
-    next()
+    return next()
   }
+
+  if (to.name === 'AdminLogin' && isAuthenticated) {
+    return next({ name: 'AdminDashboard' })
+  }
+
+  next()
 })
 
 export default router
