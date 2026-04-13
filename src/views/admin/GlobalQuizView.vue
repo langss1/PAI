@@ -206,7 +206,7 @@ const doDeleteQuestion = () => {
           <li><router-link to="/admin/materi/tambah" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white p-4 rounded-xl hover:bg-emerald-700/30 transition-all">✍️ Tambah Materi</router-link></li>
           <li><router-link to="/admin/kuis" @click="isSidebarOpen = false" class="flex items-center gap-4 text-white bg-emerald-700/60 p-4 rounded-xl shadow border border-emerald-500/30 backdrop-blur-sm transition-all">🎓 Kuis Global</router-link></li>
           <li><router-link to="/admin/kehadiran" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white p-4 rounded-xl hover:bg-emerald-700/30 transition-all">📊 Nilai Siswa</router-link></li>
-          <li><router-link to="/admin/kategori" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white p-4 rounded-xl hover:bg-emerald-700/30 transition-all">🏷️ Kategori</router-link></li>
+          <li><router-link to="/admin/kategori" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white p-4 rounded-xl hover:bg-emerald-700/30 transition-all">🏷️ Kelola Bab</router-link></li>
         </ul>
       </div>
 

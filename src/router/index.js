@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/public/HomeView.vue'
 import MaterialDetail from '../views/public/MaterialDetail.vue'
+import BabDetailView from '../views/public/BabDetailView.vue'
 
 // Admin Views
 import LoginView from '../views/admin/LoginView.vue'
@@ -19,6 +20,12 @@ const routes = [
     path: '/',
     name: 'Home',
     component: HomeView
+  },
+  {
+    path: '/bab/:categoryName',
+    name: 'BabDetail',
+    component: BabDetailView,
+    props: true
   },
   {
     path: '/materi/:id',
@@ -96,7 +103,7 @@ router.beforeEach((to, from, next) => {
     }
   } else if (to.name === 'AdminLogin' && isAuthenticated) {
     // Kalau sudah login tapi maksa buka halaman login, tendang ke dashboard
-    next({ name: 'AdminDashboard' })
+    next({ name: 'AdminLogin' })
   } else {
     next() // Rute publik, biarkan saja
   }
