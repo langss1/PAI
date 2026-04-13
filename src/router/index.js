@@ -92,20 +92,17 @@ const router = createRouter({
 // Navigation Guard untuk Security Halaman Admin
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem('admin_auth') === 'secure_token_abc123'
-  
-  // Jika rute butuh login (semua halaman admin kecuali login)
+
   if (to.matched.some(record => record.meta.requiresAuth)) {
     if (!isAuthenticated) {
-      // Belum login? Tendang ke halaman login
       next({ name: 'AdminLogin' })
     } else {
-      next() // Sudah login, silakan masuk
+      next()
     }
   } else if (to.name === 'AdminLogin' && isAuthenticated) {
-    // Kalau sudah login tapi maksa buka halaman login, tendang ke dashboard
-    next({ name: 'AdminLogin' })
+    next({ name: 'AdminDashboard' })
   } else {
-    next() // Rute publik, biarkan saja
+    next()
   }
 })
 
