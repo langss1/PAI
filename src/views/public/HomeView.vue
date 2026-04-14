@@ -35,8 +35,8 @@ onMounted(() => {
       <!-- Search and Filter -->
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12">
         <div class="text-center mb-10 animate-[fadeInDown_0.6s_ease-out]">
-          <h2 class="text-3xl md:text-5xl font-extrabold text-slate-800 drop-shadow-sm mb-4">Daftar Bab Pembelajaran</h2>
-          <p class="text-slate-500 text-base md:text-xl font-medium max-w-2xl mx-auto">Pilih bab yang ingin kamu pelajari hari ini untuk mengakses materi lengkap.</p>
+          <h2 class="text-3xl md:text-5xl font-extrabold text-slate-800 drop-shadow-sm mb-4">Mari Mulai Belajar!</h2>
+          <p class="text-slate-500 text-base md:text-xl font-medium max-w-2xl mx-auto">Jelajahi Materi dan Uji Kemampuanmu Lewat Evaluasi Kuis.</p>
         </div>
       </div>
 
