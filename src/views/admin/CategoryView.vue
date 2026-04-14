@@ -49,7 +49,7 @@ const handleAddCategory = async () => {
   const success = await store.addCategory(cleanName)
   if (success) {
     newCategoryName.value = ''
-    showPopup('Kategori berhasil ditambahkan!', 'success')
+    showPopup('Bab berhasil ditambahkan!', 'success')
   }
 }
 
@@ -63,12 +63,12 @@ const doDeleteCategory = async () => {
     selectedMaterialIds.value = []
   }
   confirmDelete.value.show = false
-  showPopup('Kategori telah dihapus.', 'success')
+  showPopup('Bab telah dihapus.', 'success')
 }
 
 const handleSaveAssignment = async () => {
   if (!selectedCategory.value) {
-    showPopup('Pilih kategori terlebih dahulu!', 'warning')
+    showPopup('Pilih bab terlebih dahulu!', 'warning')
     return
   }
 
@@ -82,7 +82,7 @@ const handleSaveAssignment = async () => {
     if (materialsToClear.length > 0) {
       await store.removeCategoryFromMaterials(materialsToClear)
     }
-    showPopup('Pembaruan kategori berhasil disimpan!', 'success')
+    showPopup('Pembaruan bab berhasil disimpan!', 'success')
   }
 }
 
@@ -126,8 +126,8 @@ onMounted(async () => {
         <div class="bg-white rounded-3xl shadow-2xl w-full max-sm:w-full max-w-sm p-8 flex flex-col items-center text-center gap-5 animate-scaleUp">
           <div class="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center text-4xl">🗑️</div>
           <div>
-            <h3 class="text-2xl font-black text-slate-800 mb-2">Hapus Kategori?</h3>
-            <p class="text-slate-500 text-sm leading-relaxed">Tagar ini akan dihapus dari semua materi yang menggunakannya. Tindakan ini tidak dapat dibatalkan.</p>
+            <h3 class="text-2xl font-black text-slate-800 mb-2">Hapus Bab?</h3>
+            <p class="text-slate-500 text-sm leading-relaxed">Bab ini akan dihapus dari semua materi yang menggunakannya. Tindakan ini tidak dapat dibatalkan.</p>
           </div>
           <div class="flex gap-3 w-full mt-2">
             <button @click="confirmDelete.show = false" class="flex-1 py-4 rounded-2xl border-2 border-slate-100 text-slate-400 font-bold hover:bg-slate-50 transition-all">Batal</button>
@@ -215,7 +215,7 @@ onMounted(async () => {
           </li>
           <li>
             <router-link to="/admin/kategori" @click="isSidebarOpen = false" class="flex items-center gap-4 text-white bg-emerald-700/60 p-4 rounded-xl shadow-inner border border-emerald-500/30 backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-lg">
-              <span class="text-xl">🏷️</span> Kelola Kategori
+              <span class="text-xl">🏷️</span> Kelola Bab
             </router-link>
           </li>
         </ul>
@@ -233,8 +233,8 @@ onMounted(async () => {
     <main class="flex-grow p-4 md:p-10 lg:p-14 relative w-full lg:max-w-[1400px] overflow-x-hidden">
 
       <div class="mb-10 animate-fadeInDown">
-        <h1 class="text-3xl md:text-5xl font-poppins font-bold text-emerald-900 mb-2 leading-tight">Kelola Kategori & Tagar #</h1>
-        <p class="text-emerald-700 font-medium text-base md:text-lg leading-relaxed">Buat kategori baru dan tentukan materi mana saja yang masuk ke topik tersebut.</p>
+        <h1 class="text-3xl md:text-5xl font-poppins font-bold text-emerald-900 mb-2 leading-tight">Kelola Bab Pembelajaran</h1>
+        <p class="text-emerald-700 font-medium text-base md:text-lg leading-relaxed">Buat bab baru dan tentukan materi mana saja yang masuk ke topik tersebut.</p>
       </div>
 
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-10">
@@ -243,7 +243,7 @@ onMounted(async () => {
         <div class="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col gap-8 animate-slideUp">
           <div class="flex items-center gap-4 border-b border-slate-100 pb-5">
             <div class="w-10 h-10 bg-emerald-100 text-emerald-700 rounded-full flex items-center justify-center text-xl font-bold">🏷️</div>
-            <h2 class="text-2xl font-bold text-emerald-900 font-poppins">Daftar Tagar #</h2>
+            <h2 class="text-2xl font-bold text-emerald-900 font-poppins">Daftar Bab (Chapter)</h2>
           </div>
 
           <div class="flex flex-col sm:flex-row gap-3">
@@ -255,7 +255,7 @@ onMounted(async () => {
               @keyup.enter="handleAddCategory"
             >
             <button @click="handleAddCategory" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-4 sm:py-0 rounded-xl transition-all shadow-lg shadow-emerald-500/20 active:scale-95 whitespace-nowrap">
-              Tambah Tagar
+              Tambah Bab
             </button>
           </div>
 
@@ -271,7 +271,7 @@ onMounted(async () => {
               </button>
             </div>
             <div v-if="categories.length === 0" class="col-span-full py-10 text-center text-slate-400 font-medium italic">
-              Belum ada kategori ditambahkan.
+              Belum ada bab ditambahkan.
             </div>
           </div>
         </div>
@@ -280,17 +280,17 @@ onMounted(async () => {
         <div class="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col gap-6 animate-slideUp [animation-delay:0.2s]">
           <div class="flex items-center gap-4 border-b border-slate-100 pb-5">
             <div class="w-10 h-10 bg-yellow-100 text-yellow-700 rounded-full flex items-center justify-center text-xl font-bold">📌</div>
-            <h2 class="text-2xl font-bold text-emerald-900 font-poppins">Penetapan Kategori Massal</h2>
+            <h2 class="text-2xl font-bold text-emerald-900 font-poppins">Penetapan Bab Massal</h2>
           </div>
 
           <div>
-            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">1. Pilih Kategori Target</label>
+            <label class="block text-xs font-bold text-slate-500 uppercase mb-2">1. Pilih Bab Target</label>
             <select
               v-model="selectedCategoryId"
               @change="handleCategorySelect"
               class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-xl p-4 outline-none transition-all font-bold text-emerald-900 appearance-none"
             >
-              <option value="">-- Pilih Kategori --</option>
+              <option value="">-- Pilih Bab --</option>
               <option v-for="cat in categories" :key="cat.id" :value="cat.id">#{{ cat.name }}</option>
             </select>
           </div>
@@ -315,12 +315,12 @@ onMounted(async () => {
                   <div class="flex-grow">
                     <p class="font-bold text-slate-800 group-hover:text-emerald-900 transition-all">{{ mat.title }}</p>
                     <p class="text-xs font-medium" :class="mat.category === selectedCategory?.name ? 'text-emerald-600' : 'text-slate-400'">
-                      {{ mat.category ? '#' + mat.category : 'Tanpa Kategori' }}
+                      {{ mat.category ? '' + mat.category : 'Tanpa Bab' }}
                     </p>
                   </div>
                 </label>
                 <div v-if="materials.length === 0" class="p-10 text-center text-slate-400 italic">
-                  Belum ada materi untuk dikategorikan.
+                  Belum ada materi untuk dimasukkan ke bab.
                 </div>
               </div>
             </div>
@@ -329,14 +329,14 @@ onMounted(async () => {
               @click="handleSaveAssignment"
               class="w-full mt-6 bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 text-white font-black py-4 rounded-xl shadow-xl shadow-emerald-600/20 transition-all active:scale-95 flex items-center justify-center gap-2"
             >
-              <span>Simpan Perubahan Tagar</span>
+              <span>Simpan Perubahan Bab</span>
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
             </button>
           </div>
 
           <div v-else class="flex flex-col items-center justify-center py-20 text-center text-slate-300 gap-4 grayscale opacity-50">
             <div class="text-6xl">🖱️</div>
-            <p class="font-bold">Pilih salah satu kategori di atas untuk mulai<br>mengelompokkan materi PAI.</p>
+            <p class="font-bold">Pilih salah satu bab di atas untuk mulai<br>mengelompokkan materi PAI.</p>
           </div>
         </div>
 

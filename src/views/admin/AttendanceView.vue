@@ -184,7 +184,7 @@ const filteredStudents = computed(() =>
           </li>
           <li>
             <router-link to="/admin/kategori" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
-              <span class="text-xl">🏷️</span> Kelola Kategori
+              <span class="text-xl">🏷️</span> Kelola Bab
             </router-link>
           </li>
         </ul>

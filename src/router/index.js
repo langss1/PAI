@@ -1,7 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/public/HomeView.vue'
 import MaterialDetail from '../views/public/MaterialDetail.vue'
-import WelcomeScreen from '../views/public/WelcomeScreen.vue'
 
 // Admin Views
 import LoginView from '../views/admin/LoginView.vue'
@@ -32,6 +31,12 @@ const routes = [
     path: '/home',
     name: 'Home',
     component: HomeView
+  },
+  {
+    path: '/bab/:categoryName',
+    name: 'BabDetail',
+    component: BabDetailView,
+    props: true
   },
   {
     path: '/materi/:id',

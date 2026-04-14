@@ -251,7 +251,7 @@ const isSidebarOpen = ref(false)
           </li>
           <li>
             <router-link to="/admin/kategori" @click="isSidebarOpen = false" class="flex items-center gap-4 text-emerald-100 hover:text-white hover:bg-emerald-700/30 p-4 rounded-xl transition-all hover:-translate-y-1">
-              <span class="text-xl">🏷️</span> Kelola Kategori
+              <span class="text-xl">🏷️</span> Kelola Bab
             </router-link>
           </li>
         </ul>
@@ -302,11 +302,16 @@ const isSidebarOpen = ref(false)
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             <div class="group">
-              <label class="block font-bold text-emerald-800 text-sm mb-2">Pilih Kategori / Topik (#)</label>
-              <select v-model="materialForm.category" class="w-full bg-slate-50 border border-slate-200 focus:border-emerald-500 rounded-lg p-4 outline-none transition-colors text-slate-800 font-bold">
-                <option value="">Tanpa Kategori</option>
-                <option v-for="cat in store.categories" :key="cat.id" :value="cat.name">#{{ cat.name }}</option>
-              </select>
+              <label class="block text-sm font-black text-slate-700 mb-2">Pilih Bab Materi</label>
+              <div class="relative group">
+                <select 
+                  v-model="materialForm.category"
+                  class="w-full pl-4 pr-4 py-4 rounded-lg border border-slate-200 focus:border-emerald-500 outline-none font-bold transition-all appearance-none cursor-pointer bg-slate-50"
+                >
+                  <option value="">-- Pilih Bab --</option>
+                  <option v-for="cat in store.categories" :key="cat.id" :value="cat.name">#{{ cat.name }}</option>
+                </select>
+              </div>
             </div>
             <div class="group">
               <label class="block font-bold text-emerald-800 text-sm mb-2">Video Edukasi (Tautan YouTube)</label>
