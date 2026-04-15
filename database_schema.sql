@@ -10,6 +10,7 @@ CREATE TABLE materials (
     title VARCHAR(255) NOT NULL,
     content TEXT NOT NULL,
     video_url TEXT,
+    canva_url TEXT,
     image_url TEXT,
     category VARCHAR(100),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
