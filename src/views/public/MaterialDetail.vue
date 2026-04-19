@@ -26,6 +26,24 @@ const youtubeEmbedUrl = computed(() => {
     : null
 })
 
+// ... kode existing ...
+
+// Daftar materi sekategori (urut sesuai store)
+const categoryMaterials = computed(() =>
+  store.materials.filter(m => m.category === materialCategory.value)
+)
+
+// Index materi saat ini
+const currentIndex = computed(() =>
+  categoryMaterials.value.findIndex(m => String(m.id) === String(props.id))
+)
+
+// Materi berikutnya (null jika sudah terakhir)
+const nextMaterial = computed(() =>
+  currentIndex.value !== -1 && currentIndex.value < categoryMaterials.value.length - 1
+    ? categoryMaterials.value[currentIndex.value + 1]
+    : null
+)
 // Kuis per-materi sekarang dihapus dan dipusatkan di Ujian PAI Utama di Beranda.
 </script>
 
@@ -38,7 +56,7 @@ const youtubeEmbedUrl = computed(() => {
         
         <!-- Tombol Kembali -->
         <router-link 
-          to="/" 
+          :to="materialCategory ? `/bab/${materialCategory}` : '/'" 
           class="flex items-center gap-2 text-emerald-100 hover:text-yellow-300 transition-all duration-200 group"
         >
           <div class="w-8 h-8 rounded-full bg-emerald-700/60 border border-emerald-500/40 flex items-center justify-center group-hover:bg-yellow-400/20 group-hover:border-yellow-400/40 transition-all duration-200">
@@ -138,17 +156,39 @@ const youtubeEmbedUrl = computed(() => {
 
             <!-- CTA Akhir -->
             <div class="mt-8 md:mt-12 bg-gradient-to-br from-emerald-50 to-emerald-100/60 border border-emerald-100 p-6 md:p-8 rounded-2xl text-center">
-              <div class="text-4xl md:text-5xl mb-3">✅</div>
-              <h2 class="text-xl sm:text-2xl font-extrabold text-emerald-900 mb-2">Selesai Mempelajari ini?</h2>
-              <p class="text-emerald-700 text-sm sm:text-base mb-6 font-medium leading-relaxed max-w-sm mx-auto">
-                Lanjutkan membaca materi lain atau kerjakan <strong>Ujian Akhir</strong> di halaman beranda untuk mendapatkan nilai.
-              </p>
-              <router-link 
-                to="/" 
-                class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-extrabold px-8 py-3 rounded-full shadow-md transition-all transform hover:-translate-y-1"
-              >
-                Kembali ke Beranda
-              </router-link>
+              
+              <!-- Jika masih ada materi berikutnya -->
+              <template v-if="nextMaterial">
+                <div class="text-4xl md:text-5xl mb-3">➡️</div>
+                <h2 class="text-xl sm:text-2xl font-extrabold text-emerald-900 mb-2">Lanjut ke Materi Berikutnya</h2>
+                <p class="text-emerald-700 text-sm sm:text-base mb-2 font-medium leading-relaxed max-w-sm mx-auto">
+                  Materi selanjutnya:
+                </p>
+                <p class="text-slate-700 font-black text-base sm:text-lg mb-6">
+                  {{ nextMaterial.title }}
+                </p>
+                <router-link
+                  :to="`/materi/${nextMaterial.id}`"
+                  class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-extrabold px-8 py-3 rounded-full shadow-md transition-all transform hover:-translate-y-1"
+                >
+                  Materi Selanjutnya →
+                </router-link>
+              </template>
+
+              <!-- Jika sudah materi terakhir -->
+              <template v-else>
+                <div class="text-4xl md:text-5xl mb-3">✅</div>
+                <h2 class="text-xl sm:text-2xl font-extrabold text-emerald-900 mb-2">Semua Materi Selesai!</h2>
+                <p class="text-emerald-700 text-sm sm:text-base mb-6 font-medium leading-relaxed max-w-sm mx-auto">
+                  Kamu telah menyelesaikan semua materi di bab ini. Kerjakan <strong>Ujian Akhir</strong> di halaman beranda untuk mendapatkan nilai.
+                </p>
+                <router-link
+                  :to="materialCategory ? `/bab/${materialCategory}` : '/'"
+                  class="inline-block bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-extrabold px-8 py-3 rounded-full shadow-md transition-all transform hover:-translate-y-1"
+                >
+                  Kembali ke Daftar Materi
+                </router-link>
+              </template>
             </div>
           </div>
         </div>
