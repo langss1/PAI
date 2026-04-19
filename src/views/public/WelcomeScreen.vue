@@ -93,6 +93,8 @@ const goHome = () => {
         <circle cx="180" cy="20" r="2" fill="rgba(255,255,255,0.25)" />
       </svg>
     </div>
+    <img src="/walisongo.png" class="side-img left" />
+    <img src="/walisongo.png" class="side-img right" />
   </div>
 </template>
 
@@ -165,6 +167,41 @@ const goHome = () => {
   padding: 2rem;
   max-width: 480px;
   width: 100%;
+}
+
+.side-img {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 320px;
+  opacity: 0.6; /* biar samar */
+  pointer-events: none;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.63));
+}
+
+.side-img.left {
+  left: 10%;
+}
+
+.side-img.right {
+  right: 10%;
+  transform: translateY(-50%) scaleX(-1); /* biar mirror */
+}
+
+@media (max-width: 768px) {
+  .side-img.left {
+    left: 50%;
+    transform: translate(-50%, -50%); /* center tengah */
+  }
+
+  .side-img.right {
+    display: none; /* sembunyikan yang kanan */
+  }
+
+  .side-img {
+    width: 320px; /* optional: kecilkan dikit biar pas di HP */
+    opacity: 0.25; /* lebih soft biar ga ganggu teks */
+  }
 }
 
 .logo-wrap {
