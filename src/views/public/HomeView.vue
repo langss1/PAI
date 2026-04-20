@@ -50,15 +50,28 @@ onMounted(() => {
           :style="{ animationDelay: `${idx * 0.1}s` }"
         >
           <!-- Bab Header / Icon -->
-          <div class="h-40 bg-gradient-to-br from-emerald-500 to-emerald-700 relative flex items-center justify-center overflow-hidden">
-             <!-- Decorative elements -->
-            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
-            <div class="absolute bottom-0 left-0 w-24 h-24 bg-yellow-400/20 rounded-full -ml-12 -mb-12 blur-xl"></div>
+          <div class="h-40 relative flex items-center justify-center overflow-hidden"
+              :class="cat.image_url ? '' : 'bg-gradient-to-br from-emerald-500 to-emerald-700'">
             
-            <span class="text-7xl group-hover:scale-110 transition duration-500">📖</span>
-            
+            <!-- Gambar cover jika ada -->
+            <img
+              v-if="cat.image_url"
+              :src="cat.image_url"
+              :alt="cat.name"
+              class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <!-- Overlay gelap tipis agar badge tetap terbaca -->
+            <div v-if="cat.image_url" class="absolute inset-0 bg-black/30"></div>
+
+            <!-- Dekorasi & emoji fallback jika tidak ada gambar -->
+            <template v-else>
+              <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl"></div>
+              <div class="absolute bottom-0 left-0 w-24 h-24 bg-yellow-400/20 rounded-full -ml-12 -mb-12 blur-xl"></div>
+              <span class="text-7xl group-hover:scale-110 transition duration-500">📖</span>
+            </template>
+
             <!-- Bab Badge -->
-            <div class="absolute top-4 left-4">
+            <div class="absolute top-4 left-4 z-10">
               <span class="bg-yellow-400 text-yellow-900 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full">
                 BAB {{ idx + 1 }}
               </span>

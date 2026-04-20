@@ -179,13 +179,36 @@ export const useMainStore = defineStore('main', {
     },
 
     // 7. Tambah Kategori
-    async addCategory(name) {
+    async addCategory(name, imageUrl = '') {
       if (!name) return false
       try {
-        const { data, error } = await supabase.from('categories').insert([{ name }]).select()
+        // Step 1: Insert name dulu tanpa image_url
+        const { data, error } = await supabase
+          .from('categories')
+          .insert([{ name }])
+          .select('id, name, created_at')
+
         if (error) throw error
+
         if (data && data.length > 0) {
-          this.categories.unshift(data[0])
+          const newCat = { ...data[0], image_url: null }
+
+          // Step 2: Jika ada gambar, update pakai .update() terpisah
+          if (imageUrl) {
+            const { error: updateError } = await supabase
+              .from('categories')
+              .update({ image_url: imageUrl })
+              .eq('id', newCat.id)
+
+            if (updateError) {
+              // Kolom image_url belum ada / cache stale — tetap lanjut tanpa gambar
+              console.warn('image_url belum bisa disimpan (schema cache). Coba reload app.', updateError.message)
+            } else {
+              newCat.image_url = imageUrl
+            }
+          }
+
+          this.categories.unshift(newCat)
           return true
         }
       } catch (e) {
